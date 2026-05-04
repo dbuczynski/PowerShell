@@ -29,8 +29,8 @@ function Clear-BUTCH {
         if ($null -ne $varsToRemove) {
             foreach ($var in $varsToRemove) {
                 # Support for -WhatIf and -Confirm
-                if ($PSCmdlet.ShouldProcess("Now Module Variable: `$script:$($var.Name)", "Remove")) {
-                    Write-Verbose "Now Removing variable: `$script:$($var.Name)"
+                if ($PSCmdlet.ShouldProcess("Module Variable: `$script:$($var.Name)", "Remove")) {
+                    Write-Verbose "Removing variable: `$script:$($var.Name)"
                     Remove-Variable -Name $var.Name -Scope Script -ErrorAction SilentlyContinue
                 }
             }
