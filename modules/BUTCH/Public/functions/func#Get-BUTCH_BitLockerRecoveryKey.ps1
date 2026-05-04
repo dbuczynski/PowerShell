@@ -32,9 +32,11 @@ function Get-BUTCH_BitLockerRecoveryKey {
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
         Version: 2026.05.03.01
+        License: MIT
+        This function is a part of the BUTCH PowerShell module.
 
     .LINK
-        https://github.com/dbuczynski/PowerShell/
+        Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true)]
