@@ -12,6 +12,12 @@ function Clear-BUTCH {
         Clear-BUTCH
         Wipes the memory of the current BUTCH session.
 
+    .INPUTS
+        None
+
+    .OUTPUTS
+        None
+
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
@@ -49,3 +55,5 @@ function Clear-BUTCH {
         Write-Information "BUTCH module data clearance completed."
     }
 }
+
+Set-Alias -Name 'Reset-BUTCH' -Value Clear-BUTCH

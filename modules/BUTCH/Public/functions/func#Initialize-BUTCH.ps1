@@ -24,6 +24,12 @@ function Initialize-BUTCH {
 
         Initializes the module and stores the provided configuration in the module's memory.
 
+    .INPUTS
+        None
+
+    .OUTPUTS
+        [void]
+
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
@@ -128,3 +134,5 @@ function Initialize-BUTCH {
         Get-BUTCH   
     }
 }
+
+Set-Alias -Name 'Init-BUTCH' -Value Initialize-BUTCH

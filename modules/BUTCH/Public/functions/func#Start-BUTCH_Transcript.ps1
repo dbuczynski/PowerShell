@@ -28,7 +28,11 @@ function Start-BUTCH_Transcript {
         ST $null
         Stops the currently running logging without starting a new one.
 
+    .INPUTS
+        [System.String]
+
     .OUTPUTS
+        [System.String]
         Details about stopped and/or started transcripts.
 
     .NOTES

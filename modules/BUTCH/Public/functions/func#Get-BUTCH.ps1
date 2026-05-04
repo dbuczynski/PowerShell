@@ -11,6 +11,12 @@ function Get-BUTCH {
         Get-BUTCH
         Returns the current module state.
 
+    .INPUTS
+        None
+
+    .OUTPUTS
+        [PSCustomObject]
+
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
@@ -18,6 +24,8 @@ function Get-BUTCH {
         
     .LINK
         https://github.com/dbuczynski/PowerShell
+
+
     #>
     [CmdletBinding()]
     param()
@@ -27,14 +35,20 @@ function Get-BUTCH {
     }
 
     PROCESS {
-        [PSCustomObject]@{
-            IsInitialized           = [bool]$script:BUTCH_IsInitialized
-            Username                = [string]$script:BUTCH_Username
-            HasPassword             = [bool]$script:BUTCH_Password
-            Param1                  = [string]$script:BUTCH_Param1
-            Param2                  = [string]$script:BUTCH_Param2
-            InitializedAt           = [datetime]$script:BUTCH_InitializedAt
-            IsInitializedFromPrompt = [bool]$script:BUTCH_IsInitializedFromPrompt
+        if ([bool]$script:BUTCH_IsInitialized) {
+            [PSCustomObject]@{
+                IsInitialized           = [bool]$script:BUTCH_IsInitialized
+                Username                = [string]$script:BUTCH_Username
+                HasPassword             = [bool]$script:BUTCH_Password
+                Param1                  = [string]$script:BUTCH_Param1
+                Param2                  = [string]$script:BUTCH_Param2
+                InitializedAt           = [datetime]$script:BUTCH_InitializedAt
+                IsInitializedFromPrompt = [bool]$script:BUTCH_IsInitializedFromPrompt
+            }
+        } else {
+            [PSCustomObject]@{
+                IsInitialized           = [bool]$script:BUTCH_IsInitialized
+            }
         }
     }
     END {

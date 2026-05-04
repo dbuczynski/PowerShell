@@ -22,6 +22,12 @@ function Get-BUTCH_BitLockerRecoveryKey {
         Get-ADComputer -filter {Name -eq 'LAPTOPABCD'} | Get-BUTCH_BitLockerRecoveryKey
         Get-ADComputer -filter {Name -like 'LAPTOP*'} | Get-BUTCH_BitLockerRecoveryKey
 
+    .INPUTS
+        [System.String]
+
+    .OUTPUTS
+        [PSCustomObject]
+
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00

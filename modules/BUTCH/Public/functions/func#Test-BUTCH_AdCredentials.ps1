@@ -20,6 +20,12 @@ function Test-BUTCH_AdCredentials {
         $cred = Get-Credential
         Test-BUTCH_AdCredentials -Credentials $cred
 
+    .INPUTS
+        [System.Management.Automation.PSCredential]
+
+    .OUTPUTS
+        [System.Boolean]
+
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
