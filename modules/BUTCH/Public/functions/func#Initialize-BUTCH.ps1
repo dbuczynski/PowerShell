@@ -26,8 +26,8 @@ function Initialize-BUTCH {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.05.04 09:00
-        Version: 2026.05.04.01
+        Release: 2026.05.03 09:00
+        Version: 2026.05.03.01
         
     .LINK
         https://github.com/dbuczynski/PowerShell

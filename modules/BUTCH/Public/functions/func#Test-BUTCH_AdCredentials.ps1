@@ -22,8 +22,8 @@ function Test-BUTCH_AdCredentials {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.05.04 09:00
-        Version: 2026.05.04.01
+        Release: 2026.05.03 09:00
+        Version: 2026.05.03.01
         
     .LINK
         https://github.com/dbuczynski/PowerShell
@@ -35,6 +35,9 @@ function Test-BUTCH_AdCredentials {
     )
 
     BEGIN {
+        if (-not $script:BUTCH_IsInitialized) {
+            Write-Warning "Module is not initialized! Please run Initialize-BUTCH first."
+        }
         if (-not $Credentials) {
             $Credentials = Get-Credential -Message "Enter Active Directory credentials to verify"
         }
