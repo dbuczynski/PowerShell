@@ -9,6 +9,17 @@
 
 .EXAMPLE
     irm https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1 | iex
+
+.NOTES
+    Author: DanielBuczynski@gmail.com
+    Release: 2026.05.03 09:00
+    Version: 2026.05.03.01
+    License: MIT
+    This function is a part of the BUTCH PowerShell module.
+    
+.LINK
+    Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
+
 #>
 
 Write-Host ""
