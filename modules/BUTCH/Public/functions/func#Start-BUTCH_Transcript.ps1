@@ -37,9 +37,6 @@ function Start-BUTCH_Transcript {
         Version: 2026.05.04.01
         
     .LINK
-        https://github.com/dbuczynski/MODULES/blob/main/BUTCH/Public/ps1/func%23Start-BUTCH_Transcript.ps1
-        
-    .LINK
         https://github.com/dbuczynski/PowerShell
     #>
     [CmdletBinding(SupportsShouldProcess = $false)]

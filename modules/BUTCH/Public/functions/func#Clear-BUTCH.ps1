@@ -11,6 +11,14 @@ function Clear-BUTCH {
     .EXAMPLE
         Clear-BUTCH
         Wipes the memory of the current BUTCH session.
+
+    .NOTES
+        Author: DanielBuczynski@gmail.com
+        Release: 2026.05.04 09:00
+        Version: 2026.05.04.01
+        
+    .LINK
+        https://github.com/dbuczynski/PowerShell
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param()

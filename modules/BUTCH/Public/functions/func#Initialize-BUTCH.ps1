@@ -23,6 +23,14 @@ function Initialize-BUTCH {
         Initialize-BUTCH -Credential $cred -Param1 "https://api.example.com" -Param2 "Production"
 
         Initializes the module and stores the provided configuration in the module's memory.
+
+    .NOTES
+        Author: DanielBuczynski@gmail.com
+        Release: 2026.05.04 09:00
+        Version: 2026.05.04.01
+        
+    .LINK
+        https://github.com/dbuczynski/PowerShell
     #>
     [CmdletBinding()]
     param(
@@ -82,12 +90,12 @@ function Initialize-BUTCH {
                 Write-Host "  Password: ********"
                 $confirm = Read-Host "Do you confirm using these credentials? [Y/n] (Enter = Yes)"
                 if ($confirm -eq 'n' -or $confirm -eq 'N') {
-                    $Credential = Get-Credential -Message "Enter credentials for the BUTCH module"
+                    $Credential = Get-Credential -Message "Enter credentials for the BUTCH module (privileged access)"
                 }
             }
             else {
                 Write-Host "No credentials provided on input." -ForegroundColor Yellow
-                $Credential = Get-Credential -Message "Enter credentials for the BUTCH module"
+                $Credential = Get-Credential -Message "Enter credentials for the BUTCH module (privileged access)"
             }
         }
     }
