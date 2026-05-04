@@ -5,11 +5,11 @@ function Start-BUTCH_Transcript {
 
     .DESCRIPTION
         The Start-BUTCH_Transcript function stops all currently running transcript sessions (preventing them from overlapping), 
-        and then starts a new session if a value is provided for the RITM parameter. The new log file is saved to the user's Desktop.
+        and then starts a new session if a value is provided for the TITLE parameter. The new log file is saved to the user's Desktop.
         
-        If an empty value or $null is passed as RITM, the function will only stop the current sessions without starting a new one.
+        If an empty value or $null is passed as TITLE, the function will only stop the current sessions without starting a new one.
 
-    .PARAMETER RITM
+    .PARAMETER TITLE
         An identifier (e.g., ticket number, task name) that will become part of the log file name. 
         Passing an empty value (or $null) simply stops any active logging.
 
@@ -17,7 +17,7 @@ function Start-BUTCH_Transcript {
         The path for transcripts (default is "ps\transcripts").
 
     .EXAMPLE
-        Start-BUTCH_Transcript -RITM "12345"
+        Start-BUTCH_Transcript -TITLE "12345"
         Stops active sessions and starts a new one, saving the logs to a file on the Desktop (e.g., *-2026-05-04-12345.txt).
 
     .EXAMPLE
@@ -44,12 +44,12 @@ function Start-BUTCH_Transcript {
     #>
     [CmdletBinding(SupportsShouldProcess = $false)]
     param(
-        [Parameter(Position = 0, Mandatory = $true)][AllowEmptyString()][string]$RITM,
-        [ValidateNotNullOrEmpty()][ValidatePattern('\S')][string]$TranscriptPath = "ps\transcripts"
+        [Parameter(Position = 0, Mandatory = $true)][AllowEmptyString()][string]$TITLE,
+        [ValidateNotNullOrEmpty()][ValidatePattern('\S')][string]$TranscriptPath = "PS\Transcripts"
     )
     BEGIN {
         if (-not $script:BUTCH_IsInitialized) {
-            throw "Module is not initialized! Please run Initialize-BUTCH first."
+            Write-Warning "Module is not initialized! Please run Initialize-BUTCH first."
         }
     }
     PROCESS {
@@ -62,8 +62,8 @@ function Start-BUTCH_Transcript {
             }
 
         }
-        if ($RITM) {
-            Start-Transcript -Append -Path ($([System.Environment]::GetFolderPath("Desktop")) + "\" + $SubPath + "-" + (Get-Date).ToString("yyyy-MM-dd") + "-" + $RITM + ".txt")
+        if ($TITLE) {
+            Start-Transcript -Append -Path ($([System.Environment]::GetFolderPath("Desktop")) + "\" + $TranscriptPath + "\" + (Get-Date).ToString("yyyy-MM-dd") + "-" + $TITLE + ".txt")
         }
     }
     END {

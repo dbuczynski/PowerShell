@@ -12,23 +12,33 @@ function Clear-BUTCH {
         Clear-BUTCH
         Wipes the memory of the current BUTCH session.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param()
     BEGIN {
         if (-not $script:BUTCH_IsInitialized) {
-            throw "Module is not initialized! Please run Initialize-BUTCH first."
+            Write-Verbose "Module is not initialized! Please run Initialize-BUTCH first."
+            break
         }
     }
     process {
         Write-Verbose "Clearing BUTCH module initialization data..."
 
-        # Wyczyść zmienne zakresowe (script scope)
-        $script:BUTCH_Username = $null
-        $script:BUTCH_Password = $null
-        $script:BUTCH_Param1 = $null
-        $script:BUTCH_Param2 = $null
-        $script:BUTCH_IsInitialized = $false
+        # Get all variables matching the pattern
+        $varsToRemove = Get-Variable -Name "BUTCH_*" -Scope Script -ErrorAction SilentlyContinue
 
-        Write-Verbose "BUTCH module data has been cleared."
+        if ($null -ne $varsToRemove) {
+            foreach ($var in $varsToRemove) {
+                # Support for -WhatIf and -Confirm
+                if ($PSCmdlet.ShouldProcess("Now Module Variable: `$script:$($var.Name)", "Remove")) {
+                    Write-Verbose "Now Removing variable: `$script:$($var.Name)"
+                    Remove-Variable -Name $var.Name -Scope Script -ErrorAction SilentlyContinue
+                }
+            }
+        }
+        else {
+            Write-Verbose "No variables starting with BUTCH_ found to remove."
+        }
+
+        Write-Verbose "BUTCH module data clearance completed."
     }
 }
