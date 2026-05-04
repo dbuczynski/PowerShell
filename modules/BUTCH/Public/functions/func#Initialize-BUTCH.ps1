@@ -105,23 +105,18 @@ function Initialize-BUTCH {
             $script:BUTCH_Password = $password
             $script:BUTCH_Param1 = $Param1
             $script:BUTCH_Param2 = $Param2
+            [datetime]$script:BUTCH_InitializedAt = Get-Date
+            [bool]$script:BUTCH_IsInitializedFromPrompt = $Silent
             $script:BUTCH_IsInitialized = $true
 
             Write-Verbose "BUTCH module initialized successfully with user: $username"
-            
-            # Return status object
-            [PSCustomObject]@{
-                Status        = "Initialized"
-                Username      = $username
-                Param1        = $Param1
-                Param2        = $Param2
-                Silent        = $Silent.IsPresent
-                InitializedAt = Get-Date
-            }
         }
         catch {
             Write-Error "Failed to initialize BUTCH module: $_"
             throw
         }
+    }
+    END {
+        Get-BUTCH   
     }
 }

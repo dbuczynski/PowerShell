@@ -20,11 +20,13 @@ function Get-BUTCH {
 
     PROCESS {
         [PSCustomObject]@{
-            IsInitialized = [bool]$script:BUTCH_IsInitialized
-            Username      = $script:BUTCH_Username
-            HasPassword   = [bool]$script:BUTCH_Password
-            Param1        = $script:BUTCH_Param1
-            Param2        = $script:BUTCH_Param2
+            IsInitialized           = [bool]$script:BUTCH_IsInitialized
+            Username                = [string]$script:BUTCH_Username
+            HasPassword             = [bool]$script:BUTCH_Password
+            Param1                  = [string]$script:BUTCH_Param1
+            Param2                  = [string]$script:BUTCH_Param2
+            InitializedAt           = [datetime]$script:BUTCH_InitializedAt
+            IsInitializedFromPrompt = [bool]$script:BUTCH_IsInitializedFromPrompt
         }
     }
     END {

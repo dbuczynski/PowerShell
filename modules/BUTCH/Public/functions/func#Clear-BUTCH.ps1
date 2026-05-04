@@ -16,12 +16,12 @@ function Clear-BUTCH {
     param()
     BEGIN {
         if (-not $script:BUTCH_IsInitialized) {
-            Write-Verbose "Module is not initialized! Please run Initialize-BUTCH first."
+            Write-Error "Module is not initialized! Please run Initialize-BUTCH first."
             break
         }
     }
     process {
-        Write-Verbose "Clearing BUTCH module initialization data..."
+        Write-Information "Clearing BUTCH module initialization data..."
 
         # Get all variables matching the pattern
         $varsToRemove = Get-Variable -Name "BUTCH_*" -Scope Script -ErrorAction SilentlyContinue
@@ -30,15 +30,14 @@ function Clear-BUTCH {
             foreach ($var in $varsToRemove) {
                 # Support for -WhatIf and -Confirm
                 if ($PSCmdlet.ShouldProcess("Module Variable: `$script:$($var.Name)", "Remove")) {
-                    Write-Verbose "Removing variable: `$script:$($var.Name)"
                     Remove-Variable -Name $var.Name -Scope Script -ErrorAction SilentlyContinue
                 }
             }
         }
         else {
-            Write-Verbose "No variables starting with BUTCH_ found to remove."
+            Write-Information "No variables starting with BUTCH_ found to remove."
         }
 
-        Write-Verbose "BUTCH module data clearance completed."
+        Write-Information "BUTCH module data clearance completed."
     }
 }
