@@ -25,7 +25,7 @@ function Get-BUTCH {
         This function is a part of the BUTCH PowerShell module.
         
     .LINK
-        Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
+        Latest version: https://github.com/dbuczynski/PowerShell
 
 
     #>
@@ -44,6 +44,7 @@ function Get-BUTCH {
                 HasPassword             = [bool]$script:BUTCH_Password
                 Param1                  = [string]$script:BUTCH_Param1
                 Param2                  = [string]$script:BUTCH_Param2
+                HashDestinationPath     = [string]$script:BUTCH_HashDestinationPath
                 InitializedAt           = [datetime]$script:BUTCH_InitializedAt
                 IsInitializedFromPrompt = [bool]$script:BUTCH_IsInitializedFromPrompt
             }

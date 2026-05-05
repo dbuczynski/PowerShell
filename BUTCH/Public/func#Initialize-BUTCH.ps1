@@ -38,7 +38,7 @@ function Initialize-BUTCH {
         This function is a part of the BUTCH PowerShell module.
         
     .LINK
-        Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
+        Latest version: https://github.com/dbuczynski/PowerShell
     #>
     [CmdletBinding()]
     param(
@@ -51,6 +51,9 @@ function Initialize-BUTCH {
         [Parameter(Position = 2)]
         [string]$Param2,
 
+        [Parameter(Position = 3)]
+        [string]$HashDestinationPath,
+
         [Parameter()]
         [switch]$Silent
     )
@@ -60,6 +63,7 @@ function Initialize-BUTCH {
             if (-not $Credential) { throw "Parameter -Credential is missing, but -Silent switch was used." }
             if ([string]::IsNullOrWhiteSpace($Param1)) { throw "Parameter -Param1 is missing, but -Silent switch was used." }
             if ([string]::IsNullOrWhiteSpace($Param2)) { throw "Parameter -Param2 is missing, but -Silent switch was used." }
+            if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) { throw "Parameter -HashDestinationPath is missing, but -Silent switch was used." }
         }
         else {
             Write-Host "--- BUTCH Module Initialization ---" -ForegroundColor Cyan
@@ -87,6 +91,19 @@ function Initialize-BUTCH {
                 $inputParam2 = Read-Host "Provide Param2 [$Param2] (Enter = keep)"
                 if (-not [string]::IsNullOrWhiteSpace($inputParam2)) { 
                     $Param2 = $inputParam2 
+                }
+            }
+
+            # HashDestinationPath
+            if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) {
+                do {
+                    $HashDestinationPath = Read-Host "Provide HashDestinationPath (e.g., \\server\share$\folder\)"
+                } while ([string]::IsNullOrWhiteSpace($HashDestinationPath))
+            }
+            else {
+                $inputHashPath = Read-Host "Provide HashDestinationPath [$HashDestinationPath] (Enter = keep)"
+                if (-not [string]::IsNullOrWhiteSpace($inputHashPath)) { 
+                    $HashDestinationPath = $inputHashPath 
                 }
             }
 
@@ -121,6 +138,7 @@ function Initialize-BUTCH {
             $script:BUTCH_Password = $password
             $script:BUTCH_Param1 = $Param1
             $script:BUTCH_Param2 = $Param2
+            $script:BUTCH_HashDestinationPath = $HashDestinationPath
             [datetime]$script:BUTCH_InitializedAt = Get-Date
             [bool]$script:BUTCH_IsInitializedFromPrompt = $Silent
             $script:BUTCH_IsInitialized = $true

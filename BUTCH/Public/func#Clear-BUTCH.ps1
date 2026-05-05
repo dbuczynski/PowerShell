@@ -8,9 +8,16 @@ function Clear-BUTCH {
         It removes the username, password, Param1, Param2, and sets the initialization status to false.
         This function is also automatically called when the module is removed (via Remove-Module).
 
+    .PARAMETER Force
+        Forces the clearance of the BUTCH module initialization data, bypassing the standard check that verifies whether the module was initialized first.
+
     .EXAMPLE
         Clear-BUTCH
         Wipes the memory of the current BUTCH session.
+
+    .EXAMPLE
+        Clear-BUTCH -Force
+        Forces the clearance of variables even if the module was never initialized during this session, suppressing the initialization warning.
 
     .INPUTS
         None
@@ -26,7 +33,7 @@ function Clear-BUTCH {
         This function is a part of the BUTCH PowerShell module.
         
     .LINK
-        Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
+        Latest version: https://github.com/dbuczynski/PowerShell
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(

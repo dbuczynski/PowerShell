@@ -1,9 +1,9 @@
 Write-host hello
 
-Set-Location C:\Users\dbuczynski\Antigravity\GIT-dbuczynski\PowerShell\modules
+Set-Location C:\Users\dbuczynski\Antigravity\GIT-dbuczynski\PowerShell
 
 
-Import-module C:\Users\dbuczynski\Antigravity\GIT-dbuczynski\PowerShell\modules\BUTCH\ -force -Verbose
+Import-module C:\Users\dbuczynski\Antigravity\GIT-dbuczynski\PowerShell\BUTCH\ -force -Verbose
 
 Remove-module BUTCH -Force -Verbose -InformationAction Continue
 

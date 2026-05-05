@@ -4,9 +4,9 @@ Welcome to my central PowerShell repository! This repository serves as a collect
 
 ## Repository Structure
 
-The repository is organized to keep large modules separated from loose scripts:
+The repository is structured to hold the main module and standalone scripts:
 
-- **[`/modules`](./modules)** - Contains complex, structured PowerShell modules (e.g., `BUTCH`). These modules follow standard `.psd1` / `.psm1` architecture and are meant to be imported into your session.
+- **[`/BUTCH`](./BUTCH)** - Contains the custom, structured `BUTCH` PowerShell module. It follows standard `.psd1` / `.psm1` architecture and is meant to be imported into your session.
 - **`/scripts`** *(Planned)* - For standalone, one-off `.ps1` automation scripts.
 
 ## License

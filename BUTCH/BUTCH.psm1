@@ -53,7 +53,6 @@ Write-Information -InformationAction Continue " These credentials may be require
 Write-Information -InformationAction Continue " accessing Active Directory, network resources, and more."
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${Cyan} Most important function: ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${BrightYellow}Initialize-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Clear-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_BitLockerRecoveryKey ${Reset} "
@@ -61,9 +60,14 @@ Write-Information -InformationAction Continue "${BrightYellow}Start-BUTCH_Transc
 Write-Information -InformationAction Continue "${BrightYellow}Test-BUTCH_AdCredentials ${Reset} "
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${Cyan} Aliases: ${Reset} " # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${BrightYellow}ST  ${Reset}          --> ${BrightCyan} Start-BUTCH_Transcript${Reset}"
 Write-Information -InformationAction Continue "${BrightYellow}Reset-BUTCH ${Reset}  --> ${BrightCyan} Clear-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Init-BUTCH ${Reset}   --> ${BrightCyan} Initialize-BUTCH ${Reset}"
+Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
+Write-Information -InformationAction Continue "${Cyan Aktualizacja on-line: ${Reset}" # -ForegroundColor Cyan
+
+Write-Information -InformationAction Continue "${BrightYellow}irm https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1 | iex ${Reset}" # -ForegroundColor Cyan
+
+
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue ""

@@ -18,7 +18,7 @@
     This function is a part of the BUTCH PowerShell module.
     
 .LINK
-    Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
+    Latest version: https://github.com/dbuczynski/PowerShell
 
 #>
 
@@ -50,7 +50,7 @@ try {
     Write-Host "[3/4] Installing to: $modulePath..."
     if (Test-Path $modulePath) { Remove-Item $modulePath -Recurse -Force -ErrorAction SilentlyContinue }
     
-    $sourceModulePath = Join-Path $tempExt "PowerShell-main\modules\BUTCH"
+    $sourceModulePath = Join-Path $tempExt "PowerShell-main\BUTCH"
     
     # Upewnij się, że główny folder Modules istnieje
     if (-not (Test-Path $userModulePath)) { New-Item -ItemType Directory -Path $userModulePath | Out-Null }

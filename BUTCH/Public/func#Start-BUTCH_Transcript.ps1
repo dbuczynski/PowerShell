@@ -18,7 +18,7 @@ function Start-BUTCH_Transcript {
 
     .EXAMPLE
         Start-BUTCH_Transcript -TITLE "12345"
-        Stops active sessions and starts a new one, saving the logs to a file on the Desktop (e.g., *-2026-05-04-12345.txt).
+        Stops active sessions and starts a new one, saving the logs to a file on the Desktop (e.g., 2026-05-04-12345.txt).
 
     .EXAMPLE
         ST test
@@ -43,7 +43,7 @@ function Start-BUTCH_Transcript {
         This function is a part of the BUTCH PowerShell module.
         
     .LINK
-        Latest version: https://github.com/dbuczynski/PowerShell/tree/main/modules/BUTCH
+        Latest version: https://github.com/dbuczynski/PowerShell
     #>
     [CmdletBinding(SupportsShouldProcess = $false)]
     param(
@@ -66,7 +66,10 @@ function Start-BUTCH_Transcript {
 
         }
         if ($TITLE) {
-            Start-Transcript -Append -Path ($([System.Environment]::GetFolderPath("Desktop")) + "\" + $TranscriptPath + "\" + (Get-Date).ToString("yyyy-MM-dd") + "-" + $TITLE + ".txt")
+            $desktopPath = [System.Environment]::GetFolderPath("Desktop")
+            $fileName = "$((Get-Date).ToString('yyyy-MM-dd'))-$TITLE.txt"
+            $fullPath = Join-Path -Path (Join-Path -Path $desktopPath -ChildPath $TranscriptPath) -ChildPath $fileName
+            Start-Transcript -Append -Path $fullPath
         }
     }
     END {
