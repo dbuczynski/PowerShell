@@ -34,7 +34,7 @@ $tempExt = Join-Path $env:TEMP "BUTCH_Extracted"
 
 # Bezpieczne pobranie ścieżki modułów bieżącego użytkownika z PSModulePath
 $userModulePath = ($env:PSModulePath -split [System.IO.Path]::PathSeparator)[0]
-$modulePath = Join-Path $userModulePath "BUTCH"
+$moduleRootPath = Join-Path $userModulePath "BUTCH"
 
 try {
     # 1. Pobieranie z GitHuba
@@ -47,19 +47,24 @@ try {
     Expand-Archive -Path $tempZip -DestinationPath $tempExt -Force
 
     # 3. Instalacja w Modules
-    Write-Host "[3/4] Installing to: $modulePath..."
-    if (Test-Path $modulePath) { Remove-Item $modulePath -Recurse -Force -ErrorAction SilentlyContinue }
-    
     $sourceModulePath = Join-Path $tempExt "PowerShell-main\BUTCH"
-    
-    # Upewnij się, że główny folder Modules istnieje
-    if (-not (Test-Path $userModulePath)) { New-Item -ItemType Directory -Path $userModulePath | Out-Null }
-    
+
+    # Odczytaj wersję z pliku manifestu
+    $psdPath = Join-Path $sourceModulePath "BUTCH.psd1"
+    $moduleVersion = (Import-PowerShellDataFile -Path $psdPath).ModuleVersion
+    $modulePath = Join-Path $moduleRootPath $moduleVersion
+
+    Write-Host "[3/4] Installing version $moduleVersion to: $modulePath..."
+
+    # Upewnij się, że foldery istnieją
+    if (-not (Test-Path $moduleRootPath)) { New-Item -ItemType Directory -Path $moduleRootPath | Out-Null }
+    if (Test-Path $modulePath) { Remove-Item $modulePath -Recurse -Force -ErrorAction SilentlyContinue }
+
     Copy-Item -Path $sourceModulePath -Destination $modulePath -Recurse -Force
 
     # 4. Import
-    Write-Host "[4/4] Importing BUTCH module..."
-    Import-Module BUTCH -Force
+    Write-Host "[4/4] Importing BUTCH module (version $moduleVersion)..."
+    Import-Module BUTCH -RequiredVersion $moduleVersion -Force
 
     Write-Host ""
     Write-Host "SUCCESS! BUTCH module installed and loaded." -ForegroundColor Green
