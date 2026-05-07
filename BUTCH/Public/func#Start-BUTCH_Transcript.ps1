@@ -54,9 +54,21 @@ function Start-BUTCH_Transcript {
         if (-not $script:BUTCH_IsInitialized) {
             Write-Warning "Module is not initialized! Please run Initialize-BUTCH first."
         }
+
+        if ($PSBoundParameters.ContainsKey('TranscriptPath')) {
+            $activePath = $TranscriptPath
+        }
+        elseif ($script:BUTCH_TranscriptPath) {
+            $activePath = $script:BUTCH_TranscriptPath
+        }
+        else {
+            $activePath = Join-Path -Path $([System.Environment]::GetFolderPath('Desktop')) -ChildPath "PS\Transcripts"
+        }
     }
     PROCESS {
+        Write-Warning "Killing existing transcripts"
         while ($true) {
+            
             try {
                 Stop-Transcript -ErrorAction Stop
             }
@@ -66,15 +78,25 @@ function Start-BUTCH_Transcript {
 
         }
         if ($TITLE) {
-            $desktopPath = [System.Environment]::GetFolderPath("Desktop")
             $fileName = "$((Get-Date).ToString('yyyy-MM-dd'))-$TITLE.txt"
-            $fullPath = Join-Path -Path (Join-Path -Path $desktopPath -ChildPath $TranscriptPath) -ChildPath $fileName
-            Start-Transcript -Append -Path $fullPath
+            if ([string]::IsNullOrWhiteSpace($activePath)) {
+                $fullPath = $fileName
+            }
+            else {
+                $fullPath = Join-Path -Path $activePath -ChildPath $fileName
+            }
+            Write-Warning "Starting transcript: $fullPath"
+            try {
+                Start-Transcript -Append -Path $fullPath
+            }
+            catch {
+                Write-Warning $_.Exception.Message
+            }
         }
     }
     END {
-    }
 
+    }
 }
 
 Set-Alias -Name 'ST' -Value Start-BUTCH_Transcript

@@ -54,16 +54,22 @@ function Initialize-BUTCH {
         [Parameter(Position = 3)]
         [string]$HashDestinationPath,
 
+        [Parameter(Position = 4)]
+        [string]$TranscriptPath,
+
         [Parameter()]
         [switch]$Silent
     )
 
     begin {
+        $defaultTranscriptPath = Join-Path -Path $([System.Environment]::GetFolderPath("Desktop")) -ChildPath "PS\Transcripts"
+
         if ($Silent) {
             if (-not $Credential) { throw "Parameter -Credential is missing, but -Silent switch was used." }
             if ([string]::IsNullOrWhiteSpace($Param1)) { throw "Parameter -Param1 is missing, but -Silent switch was used." }
             if ([string]::IsNullOrWhiteSpace($Param2)) { throw "Parameter -Param2 is missing, but -Silent switch was used." }
             if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) { throw "Parameter -HashDestinationPath is missing, but -Silent switch was used." }
+            if ([string]::IsNullOrWhiteSpace($TranscriptPath)) { $TranscriptPath = $defaultTranscriptPath }
         }
         else {
             Write-Host "--- BUTCH Module Initialization ---" -ForegroundColor Cyan
@@ -107,6 +113,22 @@ function Initialize-BUTCH {
                 }
             }
 
+            # TranscriptPath
+            if ([string]::IsNullOrWhiteSpace($TranscriptPath)) {
+                $inputTranscriptPath = Read-Host "Provide TranscriptPath (Enter = keep default: $defaultTranscriptPath)"
+                if ([string]::IsNullOrWhiteSpace($inputTranscriptPath)) {
+                    $TranscriptPath = $defaultTranscriptPath
+                } else {
+                    $TranscriptPath = $inputTranscriptPath
+                }
+            }
+            else {
+                $inputTranscriptPath = Read-Host "Provide TranscriptPath [$TranscriptPath] (Enter = keep)"
+                if (-not [string]::IsNullOrWhiteSpace($inputTranscriptPath)) { 
+                    $TranscriptPath = $inputTranscriptPath 
+                }
+            }
+
             # Credential
             if ($Credential) {
                 $username = $Credential.UserName
@@ -139,6 +161,7 @@ function Initialize-BUTCH {
             $script:BUTCH_Param1 = $Param1
             $script:BUTCH_Param2 = $Param2
             $script:BUTCH_HashDestinationPath = $HashDestinationPath
+            $script:BUTCH_TranscriptPath = $TranscriptPath
             [datetime]$script:BUTCH_InitializedAt = Get-Date
             [bool]$script:BUTCH_IsInitializedFromPrompt = $Silent
             $script:BUTCH_IsInitialized = $true

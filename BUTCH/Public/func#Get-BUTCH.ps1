@@ -45,6 +45,7 @@ function Get-BUTCH {
                 Param1                  = [string]$script:BUTCH_Param1
                 Param2                  = [string]$script:BUTCH_Param2
                 HashDestinationPath     = [string]$script:BUTCH_HashDestinationPath
+                TranscriptPath          = [string]$script:BUTCH_TranscriptPath
                 InitializedAt           = [datetime]$script:BUTCH_InitializedAt
                 IsInitializedFromPrompt = [bool]$script:BUTCH_IsInitializedFromPrompt
             }
