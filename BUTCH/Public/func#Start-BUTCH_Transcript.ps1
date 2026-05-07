@@ -5,7 +5,8 @@ function Start-BUTCH_Transcript {
 
     .DESCRIPTION
         The Start-BUTCH_Transcript function stops all currently running transcript sessions (preventing them from overlapping), 
-        and then starts a new session if a value is provided for the TITLE parameter. The new log file is saved to the user's Desktop.
+        and then starts a new session if a value is provided for the TITLE parameter. The new log file is saved to the path 
+        determined by the TranscriptPath parameter, module settings, or standard Desktop fallback.
         
         If an empty value or $null is passed as TITLE, the function will only stop the current sessions without starting a new one.
 
@@ -14,15 +15,16 @@ function Start-BUTCH_Transcript {
         Passing an empty value (or $null) simply stops any active logging.
 
     .PARAMETER TranscriptPath
-        The path for transcripts (default is "ps\transcripts").
+        Optional path for transcripts. If provided, it overrides the BUTCH_TranscriptPath variable initialized by the module for this specific session.
+        If empty or omitted, the function falls back to BUTCH_TranscriptPath, or Desktop\PS\Transcripts if module hasn't set one.
 
     .EXAMPLE
         Start-BUTCH_Transcript -TITLE "12345"
-        Stops active sessions and starts a new one, saving the logs to a file on the Desktop (e.g., 2026-05-04-12345.txt).
+        Stops active sessions and starts a new one, saving the logs to the module's initialized path (e.g., Desktop\PS\Transcripts\2026-05-04-12345.txt).
 
     .EXAMPLE
-        ST test
-        Uses the 'ST' alias to start logging (creates a file designated as 'test').
+        ST test -TranscriptPath "C:\Logs"
+        Uses the 'ST' alias to start logging and saves the file explicitly to C:\Logs.
 
     .EXAMPLE
         ST $null

@@ -5,7 +5,7 @@ if (-not $Strings) {
     Import-LocalizedData -UICulture 'en' -BindingVariable Strings -FileName Strings -ErrorAction Ignore
 }
 
-foreach ($directory in @('Public', 'External')) {
+foreach ($directory in @('Public')) {
     Get-ChildItem -Recurse -Path "$PSScriptRoot\$directory\*.ps1" | ForEach-Object { . $_.FullName }
 }
 
@@ -16,27 +16,27 @@ $MyInvocation.MyCommand.ScriptBlock.Module.OnRemove = {
 }
 
 $ESC = [char]27
-$Reset   = "$ESC[0m"
+$Reset = "$ESC[0m"
 
 # Standard colors
-$Black   = "$ESC[30m"
-$Red     = "$ESC[31m"
-$Green   = "$ESC[32m"
-$Yellow  = "$ESC[33m"
-$Blue    = "$ESC[34m"
+$Black = "$ESC[30m"
+$Red = "$ESC[31m"
+$Green = "$ESC[32m"
+$Yellow = "$ESC[33m"
+$Blue = "$ESC[34m"
 $Magenta = "$ESC[35m"
-$Cyan    = "$ESC[36m"
-$White   = "$ESC[37m"
+$Cyan = "$ESC[36m"
+$White = "$ESC[37m"
 
 # Bright variants
-$BrightBlack   = "$ESC[90m"
-$BrightRed     = "$ESC[91m"
-$BrightGreen   = "$ESC[92m"
-$BrightYellow  = "$ESC[93m"
-$BrightBlue    = "$ESC[94m"
+$BrightBlack = "$ESC[90m"
+$BrightRed = "$ESC[91m"
+$BrightGreen = "$ESC[92m"
+$BrightYellow = "$ESC[93m"
+$BrightBlue = "$ESC[94m"
 $BrightMagenta = "$ESC[95m"
-$BrightCyan    = "$ESC[96m"
-$BrightWhite   = "$ESC[97m"
+$BrightCyan = "$ESC[96m"
+$BrightWhite = "$ESC[97m"
 
 Write-Information -InformationAction Continue ""
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
@@ -64,7 +64,7 @@ Write-Information -InformationAction Continue "${BrightYellow}ST  ${Reset}      
 Write-Information -InformationAction Continue "${BrightYellow}Reset-BUTCH ${Reset}  --> ${BrightCyan} Clear-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Init-BUTCH ${Reset}   --> ${BrightCyan} Initialize-BUTCH ${Reset}"
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan Aktualizacja on-line: ${Reset}" # -ForegroundColor Cyan
+Write-Information -InformationAction Continue "${Cyan}ualizacja on-line:     ${Reset}" # oregroundColor Cyan
 
 Write-Information -InformationAction Continue "${BrightYellow}irm https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1 | iex ${Reset}" # -ForegroundColor Cyan
 

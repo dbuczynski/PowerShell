@@ -13,6 +13,6 @@
     VariablesToExport    = '*'
     AliasesToExport      = '*'
     FileList             = @(
-        '.\Public\functions\'
+        '.\Public\'
     )
 }

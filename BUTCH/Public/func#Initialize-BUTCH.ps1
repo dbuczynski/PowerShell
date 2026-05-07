@@ -4,7 +4,7 @@ function Initialize-BUTCH {
         Initializes the BUTCH module with required credentials and parameters.
 
     .DESCRIPTION
-        This function sets up the required module-scoped variables (credentials, Param1, Param2) 
+        This function sets up the required module-scoped variables (Credential, HashDestinationPath, TranscriptPath)
         that are needed by other functions in the BUTCH module. It should be run before using 
         commands that interact with the BUTCH environment.
 
@@ -12,17 +12,32 @@ function Initialize-BUTCH {
         The PSCredential object containing the username and password. 
         You can pass the result of Get-Credential here.
 
-    .PARAMETER Param1
-        The first required string parameter (e.g., API Endpoint, Server Name).
+    .PARAMETER HashDestinationPath
+        Path for hashing distributions (e.g., \\server\share$\folder\).
 
-    .PARAMETER Param2
-        The second required string parameter (e.g., Environment, Tenant ID).
+    .PARAMETER TranscriptPath
+        Default absolute path used by Start-BUTCH_Transcript to store log files.
+        If omitted, the function will suggest Desktop\PS\Transcripts as default.
+
+    .PARAMETER Silent
+        Runs initialization without interactive prompts. All required parameters must be provided on input.
+
+    .EXAMPLE
+        Initialize-BUTCH
+
+        Starts interactive initialization. The user will be prompted for all required values.
 
     .EXAMPLE
         $cred = Get-Credential
-        Initialize-BUTCH -Credential $cred -Param1 "https://api.example.com" -Param2 "Production"
+        Initialize-BUTCH -Credential $cred -HashDestinationPath "\\server\share$\folder\"
 
-        Initializes the module and stores the provided configuration in the module's memory.
+        Runs interactive initialization with Credential and HashDestinationPath pre-filled.
+
+    .EXAMPLE
+        $cred = Get-Credential
+        Initialize-BUTCH -Silent -Credential $cred -HashDestinationPath "\\server\share$\folder\" -TranscriptPath "C:\Logs"
+
+        Fully non-interactive initialization. Useful in automated/scripted environments.
 
     .INPUTS
         None
@@ -33,7 +48,7 @@ function Initialize-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
-        Version: 2026.05.03.01
+        Version: 2026.05.07.01
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -46,15 +61,9 @@ function Initialize-BUTCH {
         [pscredential]$Credential,
 
         [Parameter(Position = 1)]
-        [string]$Param1,
-
-        [Parameter(Position = 2)]
-        [string]$Param2,
-
-        [Parameter(Position = 3)]
         [string]$HashDestinationPath,
 
-        [Parameter(Position = 4)]
+        [Parameter(Position = 2)]
         [string]$TranscriptPath,
 
         [Parameter()]
@@ -65,51 +74,23 @@ function Initialize-BUTCH {
         $defaultTranscriptPath = Join-Path -Path $([System.Environment]::GetFolderPath("Desktop")) -ChildPath "PS\Transcripts"
 
         if ($Silent) {
-            if (-not $Credential) { throw "Parameter -Credential is missing, but -Silent switch was used." }
-            if ([string]::IsNullOrWhiteSpace($Param1)) { throw "Parameter -Param1 is missing, but -Silent switch was used." }
-            if ([string]::IsNullOrWhiteSpace($Param2)) { throw "Parameter -Param2 is missing, but -Silent switch was used." }
-            if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) { throw "Parameter -HashDestinationPath is missing, but -Silent switch was used." }
-            if ([string]::IsNullOrWhiteSpace($TranscriptPath)) { $TranscriptPath = $defaultTranscriptPath }
+            if (-not $Credential)                                    { throw "Parameter -Credential is missing, but -Silent switch was used." }
+            if ([string]::IsNullOrWhiteSpace($HashDestinationPath))  { throw "Parameter -HashDestinationPath is missing, but -Silent switch was used." }
+            if ([string]::IsNullOrWhiteSpace($TranscriptPath))       { $TranscriptPath = $defaultTranscriptPath }
         }
         else {
             Write-Host "--- BUTCH Module Initialization ---" -ForegroundColor Cyan
-            
-            # Param1
-            if ([string]::IsNullOrWhiteSpace($Param1)) {
-                do {
-                    $Param1 = Read-Host "Provide Param1 (required)"
-                } while ([string]::IsNullOrWhiteSpace($Param1))
-            }
-            else {
-                $inputParam1 = Read-Host "Provide Param1 [$Param1] (Enter = keep)"
-                if (-not [string]::IsNullOrWhiteSpace($inputParam1)) { 
-                    $Param1 = $inputParam1 
-                }
-            }
-
-            # Param2
-            if ([string]::IsNullOrWhiteSpace($Param2)) {
-                do {
-                    $Param2 = Read-Host "Provide Param2 (required)"
-                } while ([string]::IsNullOrWhiteSpace($Param2))
-            }
-            else {
-                $inputParam2 = Read-Host "Provide Param2 [$Param2] (Enter = keep)"
-                if (-not [string]::IsNullOrWhiteSpace($inputParam2)) { 
-                    $Param2 = $inputParam2 
-                }
-            }
 
             # HashDestinationPath
             if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) {
                 do {
-                    $HashDestinationPath = Read-Host "Provide HashDestinationPath (e.g., \\server\share$\folder\)"
+                    $HashDestinationPath = Read-Host "Provide HashDestinationPath (e.g., \\server\share`$\folder\)"
                 } while ([string]::IsNullOrWhiteSpace($HashDestinationPath))
             }
             else {
                 $inputHashPath = Read-Host "Provide HashDestinationPath [$HashDestinationPath] (Enter = keep)"
-                if (-not [string]::IsNullOrWhiteSpace($inputHashPath)) { 
-                    $HashDestinationPath = $inputHashPath 
+                if (-not [string]::IsNullOrWhiteSpace($inputHashPath)) {
+                    $HashDestinationPath = $inputHashPath
                 }
             }
 
@@ -118,14 +99,15 @@ function Initialize-BUTCH {
                 $inputTranscriptPath = Read-Host "Provide TranscriptPath (Enter = keep default: $defaultTranscriptPath)"
                 if ([string]::IsNullOrWhiteSpace($inputTranscriptPath)) {
                     $TranscriptPath = $defaultTranscriptPath
-                } else {
+                }
+                else {
                     $TranscriptPath = $inputTranscriptPath
                 }
             }
             else {
                 $inputTranscriptPath = Read-Host "Provide TranscriptPath [$TranscriptPath] (Enter = keep)"
-                if (-not [string]::IsNullOrWhiteSpace($inputTranscriptPath)) { 
-                    $TranscriptPath = $inputTranscriptPath 
+                if (-not [string]::IsNullOrWhiteSpace($inputTranscriptPath)) {
+                    $TranscriptPath = $inputTranscriptPath
                 }
             }
 
@@ -156,15 +138,13 @@ function Initialize-BUTCH {
             $password = $Credential.GetNetworkCredential().Password
 
             # Save to module-scoped variables
-            $script:BUTCH_Username = $username
-            $script:BUTCH_Password = $password
-            $script:BUTCH_Param1 = $Param1
-            $script:BUTCH_Param2 = $Param2
-            $script:BUTCH_HashDestinationPath = $HashDestinationPath
-            $script:BUTCH_TranscriptPath = $TranscriptPath
-            [datetime]$script:BUTCH_InitializedAt = Get-Date
+            $script:BUTCH_Username              = $username
+            $script:BUTCH_Password              = $password
+            $script:BUTCH_HashDestinationPath   = $HashDestinationPath
+            $script:BUTCH_TranscriptPath        = $TranscriptPath
+            [datetime]$script:BUTCH_InitializedAt       = Get-Date
             [bool]$script:BUTCH_IsInitializedFromPrompt = $Silent
-            $script:BUTCH_IsInitialized = $true
+            $script:BUTCH_IsInitialized         = $true
 
             Write-Verbose "BUTCH module initialized successfully with user: $username"
         }
@@ -173,8 +153,9 @@ function Initialize-BUTCH {
             throw
         }
     }
+
     END {
-        Get-BUTCH   
+        Get-BUTCH
     }
 }
 
