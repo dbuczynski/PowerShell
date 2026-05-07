@@ -55,6 +55,7 @@ Write-Information -InformationAction Continue "${Cyan}==========================
 Write-Information -InformationAction Continue "${Cyan} Most important function: ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${BrightYellow}Initialize-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Clear-BUTCH ${Reset} "
+Write-Information -InformationAction Continue "${BrightYellow}Update-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_BitLockerRecoveryKey ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Start-BUTCH_Transcript ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Test-BUTCH_AdCredentials ${Reset} "
