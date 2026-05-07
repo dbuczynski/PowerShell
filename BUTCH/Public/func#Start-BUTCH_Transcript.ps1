@@ -66,7 +66,7 @@ function Start-BUTCH_Transcript {
         }
     }
     PROCESS {
-        Write-Warning "Killing existing transcripts"
+        Write-Information "Killing existing transcripts"
         while ($true) {
             
             try {
@@ -85,7 +85,7 @@ function Start-BUTCH_Transcript {
             else {
                 $fullPath = Join-Path -Path $activePath -ChildPath $fileName
             }
-            Write-Warning "Starting transcript: $fullPath"
+            Write-Information "Starting transcript: $fullPath"
             try {
                 Start-Transcript -Append -Path $fullPath
             }
