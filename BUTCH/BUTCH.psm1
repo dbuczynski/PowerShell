@@ -42,8 +42,42 @@ if (-not $Strings) {
     Import-LocalizedData -UICulture 'en' -BindingVariable Strings -FileName Strings -ErrorAction Ignore
 }
 
+# Private helper — defined here, NOT exported, inaccessible outside the module
+function Read-BUTCH_Profile {
+    $profilePath = Join-Path $env:APPDATA 'BUTCH\profile.json'
+    if (-not (Test-Path $profilePath)) { return $null }
+    try {
+        $data           = Get-Content $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $securePassword = $data.PasswordEncrypted | ConvertTo-SecureString   # DPAPI — no key required
+        $plainPassword  = [System.Net.NetworkCredential]::new('', $securePassword).Password
+        return [PSCustomObject]@{
+            Username            = [string]$data.Username
+            Password            = [string]$plainPassword
+            HashDestinationPath = [string]$data.HashDestinationPath
+            TranscriptPath      = [string]$data.TranscriptPath
+        }
+    }
+    catch {
+        Write-Warning "BUTCH: Could not read saved profile: $_"
+        return $null
+    }
+}
+
 foreach ($directory in @('Public')) {
     Get-ChildItem -Recurse -Path "$PSScriptRoot\$directory\*.ps1" | ForEach-Object { . $_.FullName }
+}
+
+# Auto-load saved profile if available (silent — no prompts)
+$__butchProfile = Read-BUTCH_Profile
+if ($null -ne $__butchProfile) {
+    $script:BUTCH_Username            = $__butchProfile.Username
+    $script:BUTCH_Password            = $__butchProfile.Password
+    $script:BUTCH_HashDestinationPath = $__butchProfile.HashDestinationPath
+    $script:BUTCH_TranscriptPath      = $__butchProfile.TranscriptPath
+    $script:BUTCH_IsInitialized       = $true
+    [datetime]$script:BUTCH_InitializedAt       = Get-Date
+    [bool]$script:BUTCH_IsInitializedFromPrompt = $false
+    Remove-Variable __butchProfile -ErrorAction SilentlyContinue
 }
 
 # Funkcja wywoływana automatycznie podczas Remove-Module

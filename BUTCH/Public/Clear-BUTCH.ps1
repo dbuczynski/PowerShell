@@ -27,8 +27,11 @@ function Clear-BUTCH {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.05.03 09:00
-        Version: 2026.05.08.01
+    
+    .EXAMPLE
+        Clear-BUTCH -Force 
+        Forces the clearance of variables even if the module was never initialized during this session, suppressing the initialization warning.Release: 2026.05.03 09:00
+        Version: 2026.05.03.01
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -64,6 +67,30 @@ function Clear-BUTCH {
         }
 
         Write-Information "BUTCH module data clearance completed."
+    }
+}
+
+Set-Alias -Name 'Reset-BUTCH' -Value Clear-BUTCH
+            }
+        }
+        else {
+            Write-Information "No variables starting with BUTCH_ found to remove."
+        }
+
+        Write-Information "BUTCH module data clearance completed."
+
+        if ($PurgeLocalSettings) {
+            $profilePath = Join-Path $env:APPDATA 'BUTCH\profile.json'
+            if (Test-Path $profilePath) {
+                if ($PSCmdlet.ShouldProcess($profilePath, 'Remove BUTCH local profile file')) {
+                    Remove-Item -Path $profilePath -Force
+                    Write-Host "BUTCH local profile removed: $profilePath" -ForegroundColor Yellow
+                }
+            }
+            else {
+                Write-Host "BUTCH: No local profile file found at: $profilePath" -ForegroundColor Yellow
+            }
+        }
     }
 }
 

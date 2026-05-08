@@ -22,6 +22,20 @@ function Initialize-BUTCH {
     .PARAMETER Silent
         Runs initialization without interactive prompts. All required parameters must be provided on input.
 
+    .PARAMETER SaveProfile
+        Saves the current initialization data (credentials, paths) to a local encrypted profile file
+        at %APPDATA%\BUTCH\profile.json. The password is encrypted using DPAPI (tied to the current
+        Windows user and machine). On next Import-Module BUTCH, the profile is loaded automatically
+        without the need to run Initialize-BUTCH again.
+        Use Clear-BUTCH -PurgeLocalSettings to remove the saved profile.
+
+    .EXAMPLE
+        $cred = Get-Credential
+        Initialize-BUTCH -Silent -Credential $cred -HashDestinationPath "\\server\share$\folder\" -SaveProfile
+
+        Fully non-interactive initialization with profile saved. On next session, Import-Module BUTCH
+        will restore this configuration automatically.
+
     .EXAMPLE
         Initialize-BUTCH
 
@@ -48,7 +62,7 @@ function Initialize-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
-        Version: 2026.05.08.01
+        Version: 2026.05.08.02
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -67,7 +81,10 @@ function Initialize-BUTCH {
         [string]$TranscriptPath,
 
         [Parameter()]
-        [switch]$Silent
+        [switch]$Silent,
+
+        [Parameter()]
+        [switch]$SaveProfile
     )
 
     begin {
@@ -155,6 +172,32 @@ function Initialize-BUTCH {
     }
 
     END {
+        if ($SaveProfile) {
+            try {
+                $profileDir  = Join-Path $env:APPDATA 'BUTCH'
+                $profilePath = Join-Path $profileDir 'profile.json'
+
+                if (-not (Test-Path $profileDir)) {
+                    New-Item -ItemType Directory -Path $profileDir | Out-Null
+                }
+
+                $encryptedPassword = $Credential.Password | ConvertFrom-SecureString   # DPAPI, no key = user+machine bound
+
+                @{
+                    Username            = $script:BUTCH_Username
+                    PasswordEncrypted   = $encryptedPassword
+                    HashDestinationPath = $script:BUTCH_HashDestinationPath
+                    TranscriptPath      = $script:BUTCH_TranscriptPath
+                    SavedAt             = (Get-Date -Format 'o')
+                } | ConvertTo-Json | Set-Content -Path $profilePath -Encoding UTF8
+
+                Write-Host "BUTCH profile saved: $profilePath" -ForegroundColor Green
+                Write-Verbose "Profile saved at: $profilePath"
+            }
+            catch {
+                Write-Warning "BUTCH: Could not save profile: $_"
+            }
+        }
         Get-BUTCH
     }
 }
