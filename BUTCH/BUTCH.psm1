@@ -1,3 +1,40 @@
+<#
+.SYNOPSIS
+    BUTCH — a PowerShell module for IT administrators working in Active Directory environments.
+
+.DESCRIPTION
+    The BUTCH module provides a set of utility functions designed to simplify common
+    IT administration tasks, including:
+
+      - Credential management and AD authentication (Initialize-BUTCH, Test-BUTCH_AdCredentials)
+      - BitLocker recovery key retrieval from Active Directory (Get-BUTCH_BitLockerRecoveryKey)
+      - Secure file distribution with hash verification (Export-BUTCH_FileHash)
+      - Structured transcript / session logging (Start-BUTCH_Transcript)
+      - Module lifecycle management (Initialize-BUTCH, Clear-BUTCH, Update-BUTCH)
+
+    Before using most functions, initialize the module with:
+        Initialize-BUTCH   (alias: Init-BUTCH)
+
+    To check the current state:
+        Get-BUTCH
+
+    To update the module to the latest version:
+        Update-BUTCH
+
+.NOTES
+    Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
+    Release:  2026.05.08 09:00
+    Version:  2026.5.8.1
+    License:  MIT
+    Source:   https://github.com/dbuczynski/PowerShell
+
+.LINK
+    https://github.com/dbuczynski/PowerShell
+
+.LINK
+    https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1
+#>
+
 $culture = $host.CurrentCulture.Name -replace '-\w*$', ''
 
 Import-LocalizedData -UICulture $culture -BindingVariable Strings -FileName Strings -ErrorAction Ignore
@@ -19,24 +56,24 @@ $ESC = [char]27
 $Reset = "$ESC[0m"
 
 # Standard colors
-$Black = "$ESC[30m"
-$Red = "$ESC[31m"
-$Green = "$ESC[32m"
+# $Black = "$ESC[30m"
+# $Red = "$ESC[31m"
+# $Green = "$ESC[32m"
 $Yellow = "$ESC[33m"
-$Blue = "$ESC[34m"
-$Magenta = "$ESC[35m"
+# $Blue = "$ESC[34m"
+# $Magenta = "$ESC[35m"
 $Cyan = "$ESC[36m"
-$White = "$ESC[37m"
+# $White = "$ESC[37m"
 
 # Bright variants
-$BrightBlack = "$ESC[90m"
-$BrightRed = "$ESC[91m"
-$BrightGreen = "$ESC[92m"
+# $BrightBlack = "$ESC[90m"
+# $BrightRed = "$ESC[91m"
+# $BrightGreen = "$ESC[92m"
 $BrightYellow = "$ESC[93m"
-$BrightBlue = "$ESC[94m"
-$BrightMagenta = "$ESC[95m"
+# $BrightBlue = "$ESC[94m"
+# $BrightMagenta = "$ESC[95m"
 $BrightCyan = "$ESC[96m"
-$BrightWhite = "$ESC[97m"
+# $BrightWhite = "$ESC[97m"
 
 Write-Information -InformationAction Continue ""
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
