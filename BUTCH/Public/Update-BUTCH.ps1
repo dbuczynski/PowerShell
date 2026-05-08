@@ -41,8 +41,8 @@ function Update-BUTCH {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.05.07 00:00
-        Version: 2026.05.08.01
+        Release: 2026.5.7 00:00
+        Version: 2026.5.8.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 

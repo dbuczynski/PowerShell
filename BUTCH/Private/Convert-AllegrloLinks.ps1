@@ -2,8 +2,8 @@ function Convert-AllegroLinks {
     <#
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.05.08 16:00
-        Version: 2026.05.08.02
+        Release: 2026.5.8 16:00
+        Version: 2026.5.8.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         

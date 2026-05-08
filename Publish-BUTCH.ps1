@@ -37,8 +37,8 @@
 
 .NOTES
     Author: DanielBuczynski@gmail.com
-    Release: 2026.05.07 00:00
-    Version: 2026.05.07.01
+    Release: 2026.5.7 00:00
+    Version: 2026.5.8.4
     License: MIT
     Requires: Git installed and configured, remote 'origin' pointing to GitHub.
 
@@ -63,19 +63,19 @@ $psdPath     = Join-Path $repoRoot "BUTCH\BUTCH.psd1"
 
 Write-Host ""
 Write-Host "=============================================" -ForegroundColor Cyan
-Write-Host " BUTCH Module – Release Workflow"            -ForegroundColor Cyan
+Write-Host " BUTCH Module - Release Workflow"             -ForegroundColor Cyan
 if ($DryRun) {
-    Write-Host " [DRY RUN – no changes will be made]"   -ForegroundColor Yellow
+    Write-Host " [DRY RUN - no changes will be made]"    -ForegroundColor Yellow
 }
 Write-Host "=============================================" -ForegroundColor Cyan
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # KROK 1: Odczytaj wersje ze wszystkich plików Public\*.ps1
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "[1/5] Scanning function files for Version headers..." -ForegroundColor White
 
-$versionPattern = '^\s+Version:\s+(\d{4}\.\d{2}\.\d{2}\.\d{2})\s*$'
+$versionPattern = '^\s+Version:\s+(\d{4}\.\d{1,2}\.\d{1,2}\.\d{1,2})\s*$'
 $versions = @()
 
 Get-ChildItem -Path $publicPath -Filter "*.ps1" -Recurse | ForEach-Object {
@@ -111,9 +111,9 @@ Write-Host ""
 Write-Host "  Highest version : $highestRaw (from $highestSource)" -ForegroundColor Green
 Write-Host "  psd1 format     : $psdVersion" -ForegroundColor Green
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # KROK 2: Zweryfikuj/zaktualizuj BUTCH.psd1
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "[2/5] Verifying BUTCH.psd1 manifest..." -ForegroundColor White
 
@@ -146,9 +146,9 @@ else {
 
 $tagName = "v$psdVersion"
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # KROK 3: Git add + commit
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "[3/5] Committing changes to Git..." -ForegroundColor White
 
@@ -167,9 +167,9 @@ else {
     Write-Host "  [DRY RUN] Would run: git add . && git commit -m `"$CommitMessage`"" -ForegroundColor Yellow
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # KROK 4: Git push
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "[4/5] Pushing to remote (origin)..." -ForegroundColor White
 
@@ -182,9 +182,9 @@ else {
     Write-Host "  [DRY RUN] Would run: git push" -ForegroundColor Yellow
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # KROK 5: Git tag + push tag
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "[5/5] Creating and pushing tag: $tagName..." -ForegroundColor White
 
@@ -199,9 +199,9 @@ else {
     Write-Host "  [DRY RUN] Would run: git tag $tagName && git push origin $tagName" -ForegroundColor Yellow
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Podsumowanie
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 Write-Host ""
 Write-Host "=============================================" -ForegroundColor Cyan
 if ($DryRun) {

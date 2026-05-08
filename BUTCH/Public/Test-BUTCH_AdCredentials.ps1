@@ -28,8 +28,8 @@ function Test-BUTCH_AdCredentials {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.05.03 09:00
-        Version: 2026.05.08.01
+        Release: 2026.5.3 09:00
+        Version: 2026.5.8.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
