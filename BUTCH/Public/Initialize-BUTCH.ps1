@@ -48,7 +48,7 @@ function Initialize-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.05.03 09:00
-        Version: 2026.05.07.01
+        Version: 2026.05.08.01
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
