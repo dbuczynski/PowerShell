@@ -38,7 +38,7 @@
 .NOTES
     Author: DanielBuczynski@gmail.com
     Release: 2026.5.7 00:00
-    Version: 2026.5.9.1
+    Version: 2026.5.9.6
     License: MIT
     Requires: Git installed and configured, remote 'origin' pointing to GitHub.
 
@@ -79,11 +79,10 @@ $versionPattern = '^\s+Version:\s+(\d{4}\.\d{1,2}\.\d{1,2}\.\d{1,2})\s*$'
 $versions = @()
 
 # Lista plików do sprawdzenia: folder Public oraz skrypty instalacyjne/publikacyjne w głównym katalogu
-$filesToScan = @(
-    (Get-ChildItem -Path $publicPath -Filter "*.ps1" -Recurse),
-    (Get-ChildItem -Path $repoRoot -Filter "Install-BUTCH.ps1"),
-    (Get-ChildItem -Path $repoRoot -Filter "Publish-BUTCH.ps1")
-)
+$filesToScan = @()
+$filesToScan += Get-ChildItem -Path $publicPath -Filter "*.ps1" -Recurse
+$filesToScan += Get-ChildItem -Path $repoRoot   -Filter "Install-BUTCH.ps1"
+$filesToScan += Get-ChildItem -Path $repoRoot   -Filter "Publish-BUTCH.ps1"
 
 $filesToScan | ForEach-Object {
     if ($_ -is [System.IO.FileInfo]) {
