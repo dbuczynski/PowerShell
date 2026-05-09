@@ -15,6 +15,10 @@ function Update-BUTCH {
     .PARAMETER Force
         Forces the reinstallation even if the local version matches or is newer than the remote one.
 
+    .PARAMETER AllUsers
+        Checks for the version installed machine-wide (for all users) and updates it in that scope.
+        Requires administrative privileges for the installation step.
+
     .PARAMETER WhatIf
         Shows what would happen if the update ran without actually performing the update.
 
@@ -27,6 +31,11 @@ function Update-BUTCH {
         Update-BUTCH -Force
 
         Forces reinstallation of the module regardless of version comparison.
+
+    .EXAMPLE
+        Update-BUTCH -AllUsers
+
+        Updates the machine-wide installation of the BUTCH module (requires Administrator).
 
     .EXAMPLE
         Update-BUTCH -WhatIf
@@ -42,7 +51,7 @@ function Update-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.7 00:00
-        Version: 2026.5.8.4
+        Version: 2026.5.9.5
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -51,7 +60,8 @@ function Update-BUTCH {
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [Parameter()][switch]$Force
+        [Parameter()][switch]$Force,
+        [Parameter()][switch]$AllUsers
     )
 
     BEGIN {
@@ -61,7 +71,16 @@ function Update-BUTCH {
 
     PROCESS {
         # --- Wersja lokalna ---
-        $localModule = Get-Module -Name 'BUTCH' -ListAvailable |
+        $localModuleQuery = Get-Module -Name 'BUTCH' -ListAvailable
+
+        if ($AllUsers) {
+            # Filtruj tylko do ścieżek systemowych
+            $localModuleQuery = $localModuleQuery | Where-Object { 
+                $_.Path -match 'Program Files' -or $_.Path -match 'System32' 
+            }
+        }
+
+        $localModule = $localModuleQuery |
                        Sort-Object Version -Descending |
                        Select-Object -First 1
 
@@ -107,7 +126,11 @@ function Update-BUTCH {
 
             if ($PSCmdlet.ShouldProcess("BUTCH module", "Install version $remoteVersion")) {
                 Write-Host "Running installer..." -ForegroundColor Cyan
-                Invoke-Expression (Invoke-WebRequest -Uri $remoteInstallerUrl -UseBasicParsing).Content
+                $installerScript = (Invoke-WebRequest -Uri $remoteInstallerUrl -UseBasicParsing).Content
+                $installParams = @{}
+                if ($AllUsers) { $installParams.Add('AllUsers', $true) }
+                
+                & ([scriptblock]::Create($installerScript)) @installParams
             }
         }
         else {
