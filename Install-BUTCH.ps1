@@ -71,7 +71,7 @@
 .NOTES
     Author: DanielBuczynski@gmail.com
     Release: 2026.05.09 10:00
-    Version: 2026.05.09.02
+    Version: 2026.05.09.03
     License: MIT
 
 .LINK
@@ -101,14 +101,14 @@ Write-Host "=============================================" -ForegroundColor Cyan
 
 # Zdefiniuj URL w zależności od wersji
 if ([string]::IsNullOrWhiteSpace($Version)) {
-    $repoUrl   = "https://github.com/dbuczynski/PowerShell/archive/refs/heads/main.zip"
+    $repoUrl = "https://github.com/dbuczynski/PowerShell/archive/refs/heads/main.zip"
     $archiveSuffix = "PowerShell-main"
     Write-Host " Source  : latest (main branch)" -ForegroundColor DarkGray
 }
 else {
     # Normalizacja: dodaj 'v' jeśli brakuje
     if (-not $Version.StartsWith('v')) { $Version = "v$Version" }
-    $repoUrl   = "https://github.com/dbuczynski/PowerShell/archive/refs/tags/$Version.zip"
+    $repoUrl = "https://github.com/dbuczynski/PowerShell/archive/refs/tags/$Version.zip"
     $archiveSuffix = "PowerShell-$($Version.TrimStart('v'))"
     Write-Host " Source  : release tag $Version" -ForegroundColor DarkGray
 }
@@ -123,8 +123,8 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 if ($AllUsers) {
     # Ścieżka globalna: Program Files\PowerShell\Modules lub Windows\System32\WindowsPowerShell\...
     $targetModulePath = ($env:PSModulePath -split [System.IO.Path]::PathSeparator) |
-        Where-Object { $_ -match 'Program Files' -or $_ -match 'System32' } |
-        Select-Object -First 1
+    Where-Object { $_ -match 'Program Files' -or $_ -match 'System32' } |
+    Select-Object -First 1
     if (-not $targetModulePath) {
         Write-Error "Could not determine a machine-wide Modules path from `$env:PSModulePath."
         return
@@ -159,9 +159,9 @@ try {
     $sourceModulePath = Join-Path $tempExt "$archiveSuffix\BUTCH"
 
     # Odczytaj wersję z pliku manifestu
-    $psdPath      = Join-Path $sourceModulePath "BUTCH.psd1"
+    $psdPath = Join-Path $sourceModulePath "BUTCH.psd1"
     $moduleVersion = (Import-PowerShellDataFile -Path $psdPath).ModuleVersion
-    $modulePath   = Join-Path $moduleRootPath $moduleVersion
+    $modulePath = Join-Path $moduleRootPath $moduleVersion
 
     Write-Host "[3/4] Installing version $moduleVersion to: $modulePath..."
 
