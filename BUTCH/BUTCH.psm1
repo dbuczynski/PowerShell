@@ -24,7 +24,7 @@
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
     Release:  2026.05.08 09:00
-    Version:  2026.5.8.1
+    Version:  2026.5.9.4
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -109,37 +109,7 @@ $BrightYellow = "$ESC[93m"
 $BrightCyan = "$ESC[96m"
 # $BrightWhite = "$ESC[97m"
 
-Write-Information -InformationAction Continue ""
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan} BUTCH PowerShell Module ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue " Author:   Daniel Buczynski"
-Write-Information -InformationAction Continue " Contact:  DanielBuczynski@gmail.com"
-Write-Information -InformationAction Continue " License:  MIT License"
-Write-Information -InformationAction Continue " Source:   https://github.com/dbuczynski/PowerShell"
-Write-Information -InformationAction Continue ""
-Write-Information -InformationAction Continue " NOTE: Please run: > ${Yellow}Init-BUTCH ${Reset}" # -ForegroundColor Yellow -NoNewline
-Write-Information -InformationAction Continue " to add elevated credentials."
-Write-Information -InformationAction Continue " These credentials may be required by some functions for"
-Write-Information -InformationAction Continue " accessing Active Directory, network resources, and more."
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan} Most important function: ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${BrightYellow}Initialize-BUTCH ${Reset} "
-Write-Information -InformationAction Continue "${BrightYellow}Clear-BUTCH ${Reset} "
-Write-Information -InformationAction Continue "${BrightYellow}Update-BUTCH ${Reset} "
-# Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_BitLockerRecoveryKey ${Reset} "
-# Write-Information -InformationAction Continue "${BrightYellow}Start-BUTCH_Transcript ${Reset} "
-# Write-Information -InformationAction Continue "${BrightYellow}Test-BUTCH_AdCredentials ${Reset} "
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-# Write-Information -InformationAction Continue "${Cyan} Aliases: ${Reset} " # -ForegroundColor Cyan
-# Write-Information -InformationAction Continue "${BrightYellow}ST  ${Reset}          --> ${BrightCyan} Start-BUTCH_Transcript${Reset}"
-Write-Information -InformationAction Continue "${BrightYellow}Reset-BUTCH ${Reset}  --> ${BrightCyan} Clear-BUTCH ${Reset} "
-# Write-Information -InformationAction Continue "${BrightYellow}Init-BUTCH ${Reset}   --> ${BrightCyan} Initialize-BUTCH ${Reset}"
-Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan}ualizacja on-line:     ${Reset}" # oregroundColor Cyan
-# 
-# Write-Information -InformationAction Continue "${BrightYellow}irm https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1 | iex ${Reset}" # -ForegroundColor Cyan
-# 
+# Display module information upon import
 
 # Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 # Write-Information -InformationAction Continue ""
@@ -173,7 +143,7 @@ Write-Information -InformationAction Continue "${BrightYellow}ST  ${Reset}      
 Write-Information -InformationAction Continue "${BrightYellow}Reset-BUTCH ${Reset}  --> ${BrightCyan} Clear-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Init-BUTCH ${Reset}   --> ${BrightCyan} Initialize-BUTCH ${Reset}"
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan}ualizacja on-line:     ${Reset}" # oregroundColor Cyan
+Write-Information -InformationAction Continue "${Cyan}Aktualizacja on-line:     ${Reset}" # oregroundColor Cyan
 
 Write-Information -InformationAction Continue "${BrightYellow}irm https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1 | iex ${Reset}" # -ForegroundColor Cyan
 

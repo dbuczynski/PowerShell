@@ -71,7 +71,7 @@
 .NOTES
     Author: DanielBuczynski@gmail.com
     Release: 2026.05.09 10:00
-    Version: 2026.05.09.03
+    Version: 2026.05.09.04
     License: MIT
 
 .LINK
@@ -224,7 +224,7 @@ catch {
 
         # 4. Import
         Write-Host "[4/4] Importing BUTCH module (version $moduleVersion)..."
-        Import-Module BUTCH -RequiredVersion $moduleVersion -Force
+        Import-Module BUTCH -RequiredVersion $moduleVersion -Force -ErrorAction Stop
 
         Write-Host ""
         Write-Host "SUCCESS! BUTCH module $moduleVersion installed and loaded." -ForegroundColor Green
