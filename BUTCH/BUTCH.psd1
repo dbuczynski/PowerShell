@@ -4,7 +4,7 @@
     Author               = "Daniel Buczynski <DanielBuczynski@gmail.com>"
     CompanyName          = "githhub.com/dbuczynski"
     Description          = 'It does cool stuff for BUTCH.'
-    ModuleVersion        = "2026.5.8.4"
+    ModuleVersion        = "2026.5.9.1"
     PowerShellVersion    = "5.1"
     CompatiblePSEditions = @('Core', 'Desktop')
     Copyright            = "© 2026 All rights reserved."

@@ -70,8 +70,8 @@
 
 .NOTES
     Author: DanielBuczynski@gmail.com
-    Release: 2026.05.08 23:00
-    Version: 2026.05.08.04
+    Release: 2026.05.09 10:00
+    Version: 2026.05.09.01
     License: MIT
 
 .LINK
@@ -118,8 +118,7 @@ $tempExt = Join-Path $env:TEMP "BUTCH_Extracted"
 
 # Wybór ścieżki instalacji: użytkownik vs. globalnie (AllUsers)
 # Sprawdź uprawnienia administratora (używane niezależnie od trybu)
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent())
-                .IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if ($AllUsers) {
     # Ścieżka globalna: Program Files\PowerShell\Modules lub Windows\System32\WindowsPowerShell\...

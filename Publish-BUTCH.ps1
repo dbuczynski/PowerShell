@@ -38,7 +38,7 @@
 .NOTES
     Author: DanielBuczynski@gmail.com
     Release: 2026.5.7 00:00
-    Version: 2026.5.8.4
+    Version: 2026.5.9.1
     License: MIT
     Requires: Git installed and configured, remote 'origin' pointing to GitHub.
 
@@ -57,9 +57,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot    = $PSScriptRoot
-$publicPath  = Join-Path $repoRoot "BUTCH\Public"
-$psdPath     = Join-Path $repoRoot "BUTCH\BUTCH.psd1"
+$repoRoot = $PSScriptRoot
+$publicPath = Join-Path $repoRoot "BUTCH\Public"
+$psdPath = Join-Path $repoRoot "BUTCH\BUTCH.psd1"
 
 Write-Host ""
 Write-Host "=============================================" -ForegroundColor Cyan
@@ -70,37 +70,47 @@ if ($DryRun) {
 Write-Host "=============================================" -ForegroundColor Cyan
 
 # -----------------------------------------------------------------------------
-# KROK 1: Odczytaj wersje ze wszystkich plików Public\*.ps1
+# KROK 1: Odczytaj wersje z plików funkcji oraz skryptów głównych
 # -----------------------------------------------------------------------------
 Write-Host ""
-Write-Host "[1/5] Scanning function files for Version headers..." -ForegroundColor White
+Write-Host "[1/5] Scanning files for Version headers..." -ForegroundColor White
 
 $versionPattern = '^\s+Version:\s+(\d{4}\.\d{1,2}\.\d{1,2}\.\d{1,2})\s*$'
 $versions = @()
 
-Get-ChildItem -Path $publicPath -Filter "*.ps1" -Recurse | ForEach-Object {
-    $match = Select-String -Path $_.FullName -Pattern $versionPattern | Select-Object -First 1
-    if ($match) {
-        $rawVer = $match.Matches[0].Groups[1].Value   # e.g. 2026.05.07.01
-        $versions += [PSCustomObject]@{
-            File    = $_.Name
-            Raw     = $rawVer
-            Version = [Version]$rawVer
+# Lista plików do sprawdzenia: folder Public oraz skrypty instalacyjne/publikacyjne w głównym katalogu
+$filesToScan = @(
+    (Get-ChildItem -Path $publicPath -Filter "*.ps1" -Recurse),
+    (Get-ChildItem -Path $repoRoot -Filter "Install-BUTCH.ps1"),
+    (Get-ChildItem -Path $repoRoot -Filter "Publish-BUTCH.ps1")
+)
+
+$filesToScan | ForEach-Object {
+    if ($_ -is [System.IO.FileInfo]) {
+        $fileItem = $_
+        $match = Select-String -Path $fileItem.FullName -Pattern $versionPattern | Select-Object -First 1
+        if ($match) {
+            $rawVer = $match.Matches[0].Groups[1].Value
+            $versions += [PSCustomObject]@{
+                File    = $fileItem.Name
+                Raw     = $rawVer
+                Version = [Version]$rawVer
+            }
+            Write-Host ("  {0,-50} {1}" -f $fileItem.Name, $rawVer) -ForegroundColor DarkGray
         }
-        Write-Host ("  {0,-50} {1}" -f $_.Name, $rawVer) -ForegroundColor DarkGray
-    }
-    else {
-        Write-Warning "  No Version header found in: $($_.Name)"
+        else {
+            Write-Warning "  No Version header found in: $($fileItem.Name)"
+        }
     }
 }
 
 if ($versions.Count -eq 0) {
-    Write-Error "No version information found in any Public\*.ps1 file. Aborting."
+    Write-Error "No version information found in any scanned files. Aborting."
     exit 1
 }
 
-$highestEntry  = $versions | Sort-Object Version -Descending | Select-Object -First 1
-$highestRaw    = $highestEntry.Raw        # e.g. 2026.05.07.01
+$highestEntry = $versions | Sort-Object Version -Descending | Select-Object -First 1
+$highestRaw = $highestEntry.Raw        # e.g. 2026.05.07.01
 $highestSource = $highestEntry.File
 
 # Konwersja do formatu psd1: usuń wiodące zera (2026.05.07.01 → 2026.5.7.1)
@@ -117,7 +127,7 @@ Write-Host "  psd1 format     : $psdVersion" -ForegroundColor Green
 Write-Host ""
 Write-Host "[2/5] Verifying BUTCH.psd1 manifest..." -ForegroundColor White
 
-$psdData           = Import-PowerShellDataFile -Path $psdPath
+$psdData = Import-PowerShellDataFile -Path $psdPath
 $currentPsdVersion = $psdData.ModuleVersion
 
 Write-Host "  Current psd1 ModuleVersion : $currentPsdVersion"
