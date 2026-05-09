@@ -166,36 +166,36 @@ try {
     Write-Host "[3/4] Installing version $moduleVersion to: $modulePath..."
 
     if ($AllUsers -and -not $isAdmin) {
-        # --- Instalacja jako administrator (bieżący użytkownik bez uprawnień) ---
+        # --- Instalacja z podniesieniem uprawnień (UAC) ---
         Write-Host ""
-        Write-Host " Administrator credentials required for machine-wide installation." -ForegroundColor Yellow
-        $adminCred = Get-Credential -Message "Enter local Administrator credentials to install BUTCH for all users"
+        Write-Host " Elevation (UAC) required for machine-wide installation." -ForegroundColor Yellow
+        Write-Host " Please click 'Yes' in the system prompt." -ForegroundColor DarkGray
 
         # Tymczasowy log wynikowy
         $elevatedLog = Join-Path $env:TEMP "BUTCH_ElevatedInstall.log"
         if (Test-Path $elevatedLog) { Remove-Item $elevatedLog -Force }
 
         # Skrypt uruchamiany z podwyższonymi uprawnieniami
+        # Używamy Base64, aby uniknąć problemów z cytowaniem w argumentach Start-Process
         $elevatedScript = @"
 Set-StrictMode -Off
 `$ErrorActionPreference = 'Stop'
 try {
-    if (-not (Test-Path '$moduleRootPath')) { New-Item -ItemType Directory -Path '$moduleRootPath' | Out-Null }
+    if (-not (Test-Path '$moduleRootPath')) { New-Item -ItemType Directory -Path '$moduleRootPath' -Force | Out-Null }
     if (Test-Path '$modulePath')            { Remove-Item '$modulePath' -Recurse -Force }
     Copy-Item -Path '$sourceModulePath' -Destination '$modulePath' -Recurse -Force
     "SUCCESS" | Set-Content '$elevatedLog'
 }
 catch {
-    "ERROR: `$_" | Set-Content '$elevatedLog'
+    "ERROR: `$($_.Exception.Message)" | Set-Content '$elevatedLog'
 }
 "@
-        $elevatedScriptPath = Join-Path $env:TEMP "BUTCH_ElevatedInstall.ps1"
-        $elevatedScript | Set-Content -Path $elevatedScriptPath -Encoding UTF8
+        $encodedScript = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($elevatedScript))
 
         Write-Host "[3/4] Launching elevated install process..."
         $proc = Start-Process powershell.exe `
-            -ArgumentList "-NonInteractive -NoProfile -ExecutionPolicy Bypass -File `"$elevatedScriptPath`"" `
-            -Credential $adminCred `
+            -ArgumentList "-NoProfile -ExecutionPolicy Bypass -EncodedCommand $encodedScript" `
+            -Verb RunAs `
             -PassThru -Wait
 
         # Odczytaj log wynikowy
@@ -204,9 +204,8 @@ catch {
             Remove-Item $elevatedLog -Force -ErrorAction SilentlyContinue
         }
         else {
-            $logContent = "ERROR: Elevated process produced no output (exit code: $($proc.ExitCode))."
+            $logContent = "ERROR: Elevated process produced no output (UAC cancelled or process crashed)."
         }
-        Remove-Item $elevatedScriptPath -Force -ErrorAction SilentlyContinue
 
         if ($logContent -match '^SUCCESS') {
             Write-Host ""
