@@ -71,7 +71,7 @@
 .NOTES
     Author: DanielBuczynski@gmail.com
     Release: 2026.05.09 10:00
-    Version: 2026.05.09.01
+    Version: 2026.05.09.02
     License: MIT
 
 .LINK
