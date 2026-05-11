@@ -28,7 +28,7 @@ function Clear-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.8 11:00
-        Version: 2026.5.8.4
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -40,7 +40,8 @@ function Clear-BUTCH {
         [Parameter()][switch]$Force
     )
     BEGIN {
-        if ((-not $script:BUTCH_IsInitialized) -and (-not $force)) {
+        $isInit = Get-Variable -Name 'BUTCH_IsInitialized' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+        if (($isInit -ne $true) -and (-not $force)) {
             Write-Warning "Module is not initialized! Please run Initialize-BUTCH first."
             break
         }

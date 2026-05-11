@@ -62,7 +62,7 @@ function Initialize-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.3 09:00
-        Version: 2026.5.8.4
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -182,12 +182,17 @@ function Initialize-BUTCH {
                 }
 
                 $encryptedPassword = $Credential.Password | ConvertFrom-SecureString   # DPAPI, no key = user+machine bound
+                
+                # Use local variables to avoid script: scope issues in the profile object construction
+                $profileUsername = Get-Variable -Name 'BUTCH_Username' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                $profileHashPath = Get-Variable -Name 'BUTCH_HashDestinationPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                $profileTransPath = Get-Variable -Name 'BUTCH_TranscriptPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
 
                 @{
-                    Username            = $script:BUTCH_Username
+                    Username            = $profileUsername
                     PasswordEncrypted   = $encryptedPassword
-                    HashDestinationPath = $script:BUTCH_HashDestinationPath
-                    TranscriptPath      = $script:BUTCH_TranscriptPath
+                    HashDestinationPath = $profileHashPath
+                    TranscriptPath      = $profileTransPath
                     SavedAt             = (Get-Date -Format 'o')
                 } | ConvertTo-Json | Set-Content -Path $profilePath -Encoding UTF8
 

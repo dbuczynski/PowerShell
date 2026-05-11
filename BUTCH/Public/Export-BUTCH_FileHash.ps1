@@ -29,7 +29,7 @@ function Export-BUTCH_FileHash {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.4 15:00
-        Version: 2026.5.8.4
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -52,22 +52,25 @@ function Export-BUTCH_FileHash {
     )
 
     BEGIN {
-        if (-not $script:BUTCH_IsInitialized) {
+        $isInit = Get-Variable -Name 'BUTCH_IsInitialized' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+        if ($isInit -ne $true) {
             Write-Warning "Module is not initialized! Please run Init-BUTCH first."
             break
         }
+        
+        $destPath = Get-Variable -Name 'BUTCH_HashDestinationPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
 
-        if ([string]::IsNullOrWhiteSpace($script:BUTCH_HashDestinationPath)) {
+        if ([string]::IsNullOrWhiteSpace($destPath)) {
             Write-Warning "BUTCH_HashDestinationPath is not set. Please run Init-BUTCH and provide the destination path."
             break
         }
 
-        if (-not (Test-Path $script:BUTCH_HashDestinationPath)) {
+        if (-not (Test-Path $destPath)) {
             try {
-                New-Item -ItemType Directory -Path $script:BUTCH_HashDestinationPath -Force | Out-Null
+                New-Item -ItemType Directory -Path $destPath -Force | Out-Null
             }
             catch {
-                Write-Warning "Could not access or create destination path: $($script:BUTCH_HashDestinationPath)"
+                Write-Warning "Could not access or create destination path: $destPath"
                 break
             }
         }
@@ -111,8 +114,8 @@ function Export-BUTCH_FileHash {
                 Add-Content -Path $TempHashFile -Value $CSVLine
 
                 # Copy BOTH files simultaneously (as close as possible) to the destination
-                Write-Verbose "Copying files to destination: $($script:BUTCH_HashDestinationPath)"
-                Copy-Item -Path "$TempFolder\*" -Destination $script:BUTCH_HashDestinationPath -Force
+                Write-Verbose "Copying files to destination: $destPath"
+                Copy-Item -Path "$TempFolder\*" -Destination $destPath -Force
 
                 # Cleanup temp folder
                 Remove-Item -Path $TempFolder -Recurse -Force
@@ -120,7 +123,7 @@ function Export-BUTCH_FileHash {
                 $Summary += [PSCustomObject]@{
                     FileName         = $FileItem.Name
                     SourcePath       = $FileItem.FullName
-                    DestinationPath  = $script:BUTCH_HashDestinationPath
+                    DestinationPath  = $destPath
                     Algorithm        = $SignatureAlgorithm
                     Hash             = $CalculatedHash.Hash
                     SignatureStatus  = if ($DigSig.SignatureType -ieq 'None') { 'NotSigned' } else { $DigSig.Status }
@@ -132,7 +135,7 @@ function Export-BUTCH_FileHash {
                 $Summary += [PSCustomObject]@{
                     FileName         = $FileItem.Name
                     SourcePath       = $FileItem.FullName
-                    DestinationPath  = $script:BUTCH_HashDestinationPath
+                    DestinationPath  = $destPath
                     Algorithm        = $SignatureAlgorithm
                     Hash             = $null
                     SignatureStatus  = $null

@@ -40,7 +40,7 @@ function Start-BUTCH_Transcript {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.3 09:00
-        Version: 2026.5.8.4
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -50,21 +50,25 @@ function Start-BUTCH_Transcript {
     [CmdletBinding(SupportsShouldProcess = $false)]
     param(
         [Parameter(Position = 0, Mandatory = $true)][AllowEmptyString()][string]$TITLE,
-        [ValidateNotNullOrEmpty()][ValidatePattern('\S')][string]$TranscriptPath = "PS\Transcripts"
+        [Parameter(Position = 1)][ValidateNotNullOrEmpty()][ValidatePattern('\S')][string]$TranscriptPath = "PS\Transcripts"
     )
     BEGIN {
-        if (-not $script:BUTCH_IsInitialized) {
+        $isInit = Get-Variable -Name 'BUTCH_IsInitialized' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+        if ($null -eq $isInit -or $isInit -eq $false) {
             Write-Warning "Module is not initialized! Please run Initialize-BUTCH first."
         }
 
         if ($PSBoundParameters.ContainsKey('TranscriptPath')) {
             $activePath = $TranscriptPath
         }
-        elseif ($script:BUTCH_TranscriptPath) {
-            $activePath = $script:BUTCH_TranscriptPath
-        }
         else {
-            $activePath = Join-Path -Path $([System.Environment]::GetFolderPath('Desktop')) -ChildPath "PS\Transcripts"
+            $savedPath = Get-Variable -Name 'BUTCH_TranscriptPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+            if ($savedPath) {
+                $activePath = $savedPath
+            }
+            else {
+                $activePath = Join-Path -Path $([System.Environment]::GetFolderPath('Desktop')) -ChildPath "PS\Transcripts"
+            }
         }
     }
     PROCESS {
@@ -79,6 +83,12 @@ function Start-BUTCH_Transcript {
             }
 
         }
+        
+        # Restore standard prompt when transcripts are stopped
+        function global:prompt {
+            "PS $((Get-Location).Path)> "
+        }
+
         if ($TITLE) {
             $fileName = "$((Get-Date).ToString('yyyy-MM-dd'))-$TITLE.txt"
             if ([string]::IsNullOrWhiteSpace($activePath)) {
@@ -89,10 +99,15 @@ function Start-BUTCH_Transcript {
             }
             Write-Information "Starting transcript: $fullPath"
             try {
-                Start-Transcript -Append -Path $fullPath
+                Start-Transcript -Append -Path $fullPath -ErrorAction Stop
+                
+                # Success - change prompt to include the transcript filename
+                # We use Invoke-Expression to define the function in the global scope with the current filename
+                $newPrompt = "function global:prompt { 'PS [$fileName] ' + (Get-Location).Path + '> ' }"
+                Invoke-Expression $newPrompt
             }
             catch {
-                Write-Warning $_.Exception.Message
+                Write-Warning "Failed to start transcript: $($_.Exception.Message)"
             }
         }
     }

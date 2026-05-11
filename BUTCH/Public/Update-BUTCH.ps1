@@ -51,7 +51,7 @@ function Update-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.7 00:00
-        Version: 2026.5.9.5
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 

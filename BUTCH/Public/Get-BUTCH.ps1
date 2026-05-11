@@ -20,7 +20,7 @@ function Get-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.3 09:00
-        Version: 2026.5.8.4
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -37,20 +37,21 @@ function Get-BUTCH {
     }
 
     PROCESS {
-        if ([bool]$script:BUTCH_IsInitialized) {
+        $isInit = Get-Variable -Name 'BUTCH_IsInitialized' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+        if ($isInit -eq $true) {
             [PSCustomObject]@{
-                IsInitialized           = [bool]$script:BUTCH_IsInitialized
-                Username                = [string]$script:BUTCH_Username
-                HasPassword             = [bool]$script:BUTCH_Password
-                HashDestinationPath     = [string]$script:BUTCH_HashDestinationPath
-                TranscriptPath          = [string]$script:BUTCH_TranscriptPath
-                InitializedAt           = [datetime]$script:BUTCH_InitializedAt
-                IsInitializedFromPrompt = [bool]$script:BUTCH_IsInitializedFromPrompt
+                IsInitialized           = $true
+                Username                = Get-Variable -Name 'BUTCH_Username' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                HasPassword             = [bool](Get-Variable -Name 'BUTCH_Password' -Scope Script -ValueOnly -ErrorAction SilentlyContinue)
+                HashDestinationPath     = Get-Variable -Name 'BUTCH_HashDestinationPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                TranscriptPath          = Get-Variable -Name 'BUTCH_TranscriptPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                InitializedAt           = Get-Variable -Name 'BUTCH_InitializedAt' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                IsInitializedFromPrompt = Get-Variable -Name 'BUTCH_IsInitializedFromPrompt' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
             }
         }
         else {
             [PSCustomObject]@{
-                IsInitialized = [bool]$script:BUTCH_IsInitialized
+                IsInitialized = [bool]$isInit
             }
         }
     }

@@ -31,7 +31,7 @@ function Get-BUTCH_BitLockerRecoveryKey {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.3 09:00
-        Version: 2026.5.8.4
+        Version: 2026.5.11.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -56,7 +56,8 @@ function Get-BUTCH_BitLockerRecoveryKey {
     )
 
     BEGIN {
-        if (-not $script:BUTCH_IsInitialized) {
+        $isInit = Get-Variable -Name 'BUTCH_IsInitialized' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+        if ($isInit -ne $true) {
             Write-Warning "Module is not initialized! Please run Initialize-BUTCH first."
         }
         Write-Verbose "Starting validation"

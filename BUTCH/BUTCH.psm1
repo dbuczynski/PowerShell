@@ -24,7 +24,7 @@
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
     Release:  2026.05.08 09:00
-    Version:  2026.5.9.4
+    Version:  2026.5.11.2
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -34,6 +34,15 @@
 .LINK
     https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1
 #>
+
+# Initialize module-scoped variables to avoid "variable not set" errors in strict mode
+$script:BUTCH_IsInitialized         = $false
+$script:BUTCH_Username              = $null
+$script:BUTCH_Password              = $null
+$script:BUTCH_HashDestinationPath   = $null
+$script:BUTCH_TranscriptPath        = $null
+$script:BUTCH_InitializedAt         = $null
+$script:BUTCH_IsInitializedFromPrompt = $false
 
 $culture = $host.CurrentCulture.Name -replace '-\w*$', ''
 
