@@ -40,7 +40,7 @@ function Get-BUTCH_RemoteAdministrator {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.19 14:45
-        Version: 2026.5.19.5
+        Version: 2026.5.19.6
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -161,6 +161,23 @@ function Get-BUTCH_RemoteAdministrator {
                 GroupName    = $groupName
                 Members      = $members
             }
+        }
+    }
+
+    END {
+        # Reserved for potential resource cleanup
+    }
+}
+            }
+
+            $outputObj = [PSCustomObject]@{
+                ComputerName = $computer
+                Status       = $status
+                GroupName    = $groupName
+                Members      = $members
+                ErrorMessage = $errorMessage
+            }
+            Set-DefaultDisplayProperties -Object $outputObj
         }
     }
 
