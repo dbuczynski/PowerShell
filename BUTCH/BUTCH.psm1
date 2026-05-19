@@ -24,7 +24,7 @@
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
     Release:  2026.05.08 09:00
-    Version:  2026.5.19.9
+    Version:  2026.5.11.10
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -36,12 +36,12 @@
 #>
 
 # Initialize module-scoped variables to avoid "variable not set" errors in strict mode
-$script:BUTCH_IsInitialized         = $false
-$script:BUTCH_Username              = $null
-$script:BUTCH_Password              = $null
-$script:BUTCH_HashDestinationPath   = $null
-$script:BUTCH_TranscriptPath        = $null
-$script:BUTCH_InitializedAt         = $null
+$script:BUTCH_IsInitialized = $false
+$script:BUTCH_Username = $null
+$script:BUTCH_Password = $null
+$script:BUTCH_HashDestinationPath = $null
+$script:BUTCH_TranscriptPath = $null
+$script:BUTCH_InitializedAt = $null
 $script:BUTCH_IsInitializedFromPrompt = $false
 
 $culture = $host.CurrentCulture.Name -replace '-\w*$', ''
@@ -56,9 +56,9 @@ function Read-BUTCH_Profile {
     $profilePath = Join-Path $env:APPDATA 'BUTCH\profile.json'
     if (-not (Test-Path $profilePath)) { return $null }
     try {
-        $data           = Get-Content $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $data = Get-Content $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
         $securePassword = $data.PasswordEncrypted | ConvertTo-SecureString   # DPAPI — no key required
-        $plainPassword  = [System.Net.NetworkCredential]::new('', $securePassword).Password
+        $plainPassword = [System.Net.NetworkCredential]::new('', $securePassword).Password
         return [PSCustomObject]@{
             Username            = [string]$data.Username
             Password            = [string]$plainPassword
@@ -79,12 +79,12 @@ foreach ($directory in @('Public')) {
 # Auto-load saved profile if available (silent — no prompts)
 $__butchProfile = Read-BUTCH_Profile
 if ($null -ne $__butchProfile) {
-    $script:BUTCH_Username            = $__butchProfile.Username
-    $script:BUTCH_Password            = $__butchProfile.Password
+    $script:BUTCH_Username = $__butchProfile.Username
+    $script:BUTCH_Password = $__butchProfile.Password
     $script:BUTCH_HashDestinationPath = $__butchProfile.HashDestinationPath
-    $script:BUTCH_TranscriptPath      = $__butchProfile.TranscriptPath
-    $script:BUTCH_IsInitialized       = $true
-    [datetime]$script:BUTCH_InitializedAt       = Get-Date
+    $script:BUTCH_TranscriptPath = $__butchProfile.TranscriptPath
+    $script:BUTCH_IsInitialized = $true
+    [datetime]$script:BUTCH_InitializedAt = Get-Date
     [bool]$script:BUTCH_IsInitializedFromPrompt = $false
     Remove-Variable __butchProfile -ErrorAction SilentlyContinue
 }
@@ -131,12 +131,6 @@ $BrightCyan = "$ESC[96m"
 # $BrightWhite = "$ESC[97m"
 
 # Display module information upon import
-
-# Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-# Write-Information -InformationAction Continue ""
-
-# $BrightWhite = "$ESC[97m"
-
 Write-Information -InformationAction Continue ""
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${Cyan} BUTCH PowerShell Module (v$moduleVersion)${Reset}" # -ForegroundColor Cyan
@@ -167,7 +161,6 @@ Write-Information -InformationAction Continue "${Cyan}==========================
 Write-Information -InformationAction Continue "${Cyan}Aktualizacja on-line:     ${Reset}" # oregroundColor Cyan
 
 Write-Information -InformationAction Continue "${BrightYellow}irm https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1 | iex ${Reset}" # -ForegroundColor Cyan
-
 
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue ""
