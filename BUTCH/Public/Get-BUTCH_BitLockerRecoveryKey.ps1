@@ -31,7 +31,7 @@ function Get-BUTCH_BitLockerRecoveryKey {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.3 09:00
-        Version: 2026.5.11.4
+        Version: 2026.5.19.8
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -39,7 +39,7 @@ function Get-BUTCH_BitLockerRecoveryKey {
         Latest version: https://github.com/dbuczynski/PowerShell
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true)]
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Computer name to be checked")]
         [ValidateScript({
