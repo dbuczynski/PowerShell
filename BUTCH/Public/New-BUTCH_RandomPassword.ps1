@@ -59,8 +59,8 @@ function New-BUTCH_RandomPassword {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.5.19 13:53
-        Version: 2026.5.19.2
+        Release: 2026.5.19 13:55
+        Version: 2026.5.19.3
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -170,7 +170,7 @@ function New-BUTCH_RandomPassword {
         }
 
         # Helper to generate a single password
-        function Generate-SinglePassword {
+        function New-SinglePassword {
             # Ensure length is at least the number of active pools to guarantee complexity
             $len = $Lenght
             if ($len -lt $activePools.Count) {
@@ -222,7 +222,7 @@ function New-BUTCH_RandomPassword {
             foreach ($item in $InputObject) {
                 if ($null -ne $item) {
                     $script:InputItems.Add($item)
-                    $pass = Generate-SinglePassword
+                    $pass = New-SinglePassword
 
                     # Output details matching user request:
                     # * dla SecureString -eq $false: {wartość z input}, Password, SecuredPassword = (SecureString), ...
@@ -262,7 +262,7 @@ function New-BUTCH_RandomPassword {
 
         if ($script:InputItems.Count -eq 0) {
             # Self-standing execution
-            $pass = Generate-SinglePassword
+            $pass = New-SinglePassword
             Write-Information -MessageData ("Randomly generated password: " + $pass) -InformationAction Continue
             if ($SecureString) {
                 return ConvertTo-SecureStringHelper $pass
