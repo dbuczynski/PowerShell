@@ -40,7 +40,7 @@ function Get-BUTCH_RemoteAdministrator {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.19 14:45
-        Version: 2026.5.19.7
+        Version: 2026.5.19.9
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
