@@ -40,7 +40,7 @@ function Get-BUTCH_RemoteAdministrator {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.19 14:45
-        Version: 2026.5.19.6
+        Version: 2026.5.19.7
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -71,6 +71,16 @@ function Get-BUTCH_RemoteAdministrator {
         Write-Verbose "Retrieved credentials for user: $username"
         $secPassword = ConvertTo-SecureString $password -AsPlainText -Force
         $credential = New-Object System.Management.Automation.PSCredential($username, $secPassword)
+
+        # Helper to set default display properties on PSCustomObject
+        function Set-DefaultDisplayProperties {
+            param([PSCustomObject]$Object)
+            $defaultDisplaySet = @('ComputerName', 'Status', 'GroupName', 'Members')
+            $defaultDisplayPropertySet = New-Object System.Management.Automation.PSPropertySet('DefaultDisplayPropertySet', [string[]]$defaultDisplaySet)
+            $PSStandardMembers = [System.Management.Automation.PSMemberInfo[]]@($defaultDisplayPropertySet)
+            $Object | Add-Member -MemberType MemberSet -Name PSStandardMembers -Value $PSStandardMembers -Force | Out-Null
+            return $Object
+        }
     }
 
     PROCESS {
@@ -78,36 +88,39 @@ function Get-BUTCH_RemoteAdministrator {
             if ($null -eq $item) { continue }
 
             $computer = $null
-            $isComputerType = $true
+            $status = $false
+            $errorMessage = $null
+            $groupName = $null
+            $members = @()
 
             # Check if the input is a rich object (e.g. AD computer object)
-            if ($item.PSObject -ne $null) {
+            if ($null -ne $item.PSObject) {
                 $objectClass = $null
-                if ($item.PSObject.Properties['ObjectClass'] -ne $null) {
+                if ($null -ne $item.PSObject.Properties['ObjectClass']) {
                     $objectClass = $item.ObjectClass
                 }
 
                 # If ObjectClass is present and it is NOT 'computer', reject the object
                 if ($null -ne $objectClass -and $objectClass -ne 'computer') {
                     $itemName = $item.Name
-                    if ([string]::IsNullOrWhiteSpace($itemName) -and $item.PSObject.Properties['SamAccountName'] -ne $null) {
+                    if ([string]::IsNullOrWhiteSpace($itemName) -and $null -ne $item.PSObject.Properties['SamAccountName']) {
                         $itemName = $item.SamAccountName
                     }
                     if ([string]::IsNullOrWhiteSpace($itemName)) {
                         $itemName = $item.ToString()
                     }
-                    Write-Error "Object '$itemName' is of class '$objectClass', but a computer account is required."
-                    $isComputerType = $false
+                    $computer = $itemName
+                    $errorMessage = "Object '$itemName' is of class '$objectClass', but a computer account is required."
                 }
                 else {
                     # Attempt to resolve name from common AD computer properties
-                    if ($item.PSObject.Properties['DNSHostName'] -ne $null -and -not [string]::IsNullOrWhiteSpace($item.DNSHostName)) {
+                    if ($null -ne $item.PSObject.Properties['DNSHostName'] -and -not [string]::IsNullOrWhiteSpace($item.DNSHostName)) {
                         $computer = $item.DNSHostName
                     }
-                    elseif ($item.PSObject.Properties['Name'] -ne $null -and -not [string]::IsNullOrWhiteSpace($item.Name)) {
+                    elseif ($null -ne $item.PSObject.Properties['Name'] -and -not [string]::IsNullOrWhiteSpace($item.Name)) {
                         $computer = $item.Name
                     }
-                    elseif ($item.PSObject.Properties['SamAccountName'] -ne $null -and -not [string]::IsNullOrWhiteSpace($item.SamAccountName)) {
+                    elseif ($null -ne $item.PSObject.Properties['SamAccountName'] -and -not [string]::IsNullOrWhiteSpace($item.SamAccountName)) {
                         $computer = $item.SamAccountName
                     }
                     else {
@@ -120,54 +133,41 @@ function Get-BUTCH_RemoteAdministrator {
                 $computer = $item.ToString()
             }
 
-            # Skip if type check failed or computer name is empty
-            if (-not $isComputerType -or [string]::IsNullOrWhiteSpace($computer)) {
+            # Skip if computer name is empty and we had no error message
+            if ([string]::IsNullOrWhiteSpace($computer) -and -not $errorMessage) {
                 continue
             }
 
-            Write-Verbose "Checking local Administrators group on computer: $computer"
+            # If we don't have an error message yet, proceed to remote execution
+            if (-not $errorMessage) {
+                Write-Verbose "Checking local Administrators group on computer: $computer"
 
-            $status = $false
-            $groupName = $null
-            $members = @()
+                try {
+                    $remoteResult = Invoke-Command -ComputerName $computer -Credential $credential -ScriptBlock {
+                        $adminGroup = Get-LocalGroup | Where-Object { $_.SID -eq 'S-1-5-32-544' }
+                        if (-not $adminGroup) {
+                            throw "Local Administrators group (SID S-1-5-32-544) was not found on this system."
+                        }
+                        $gName = $adminGroup.Name
+                        $mList = @(Get-LocalGroupMember -Group $gName | Select-Object -ExpandProperty Name)
+                        
+                        [PSCustomObject]@{
+                            GroupName = $gName
+                            Members   = $mList
+                        }
+                    } -ErrorAction Stop
 
-            try {
-                $remoteResult = Invoke-Command -ComputerName $computer -Credential $credential -ScriptBlock {
-                    $adminGroup = Get-LocalGroup | Where-Object { $_.SID -eq 'S-1-5-32-544' }
-                    if (-not $adminGroup) {
-                        throw "Local Administrators group (SID S-1-5-32-544) was not found on this system."
+                    $status = $true
+                    $groupName = $remoteResult.GroupName
+                    $members = $remoteResult.Members
+                }
+                catch {
+                    $status = $false
+                    $errorMessage = $_.Exception.Message
+                    if (-not $errorMessage) {
+                        $errorMessage = $_.ToString()
                     }
-                    $gName = $adminGroup.Name
-                    $mList = @(Get-LocalGroupMember -Group $gName | Select-Object -ExpandProperty Name)
-                    
-                    [PSCustomObject]@{
-                        GroupName = $gName
-                        Members   = $mList
-                    }
-                } -ErrorAction Stop
-
-                $status = $true
-                $groupName = $remoteResult.GroupName
-                $members = $remoteResult.Members
-            }
-            catch {
-                Write-Error "Failed to retrieve local Administrators for '$computer': $_"
-                $status = $false
-            }
-
-            [PSCustomObject]@{
-                ComputerName = $computer
-                Status       = $status
-                GroupName    = $groupName
-                Members      = $members
-            }
-        }
-    }
-
-    END {
-        # Reserved for potential resource cleanup
-    }
-}
+                }
             }
 
             $outputObj = [PSCustomObject]@{
