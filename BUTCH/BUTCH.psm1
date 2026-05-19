@@ -24,7 +24,7 @@
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
     Release:  2026.05.08 09:00
-    Version:  2026.5.11.2
+    Version:  2026.5.19.9
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -95,6 +95,18 @@ $MyInvocation.MyCommand.ScriptBlock.Module.OnRemove = {
     Clear-BUTCH -Force
 }
 
+$moduleVersion = "unknown"
+$psdPath = Join-Path $PSScriptRoot "BUTCH.psd1"
+if (Test-Path $psdPath) {
+    try {
+        $psdData = Import-PowerShellDataFile -Path $psdPath
+        if ($null -ne $psdData -and $null -ne $psdData.ModuleVersion) {
+            $moduleVersion = $psdData.ModuleVersion
+        }
+    }
+    catch {}
+}
+
 $ESC = [char]27
 $Reset = "$ESC[0m"
 
@@ -127,7 +139,7 @@ $BrightCyan = "$ESC[96m"
 
 Write-Information -InformationAction Continue ""
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
-Write-Information -InformationAction Continue "${Cyan} BUTCH PowerShell Module ${Reset}" # -ForegroundColor Cyan
+Write-Information -InformationAction Continue "${Cyan} BUTCH PowerShell Module (v$moduleVersion)${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue " Author:   Daniel Buczynski"
 Write-Information -InformationAction Continue " Contact:  DanielBuczynski@gmail.com"
