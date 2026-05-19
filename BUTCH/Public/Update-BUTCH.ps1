@@ -51,7 +51,7 @@ function Update-BUTCH {
     .NOTES
         Author: DanielBuczynski@gmail.com
         Release: 2026.5.7 00:00
-        Version: 2026.5.11.4
+        Version: 2026.5.19.10
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -65,7 +65,7 @@ function Update-BUTCH {
     )
 
     BEGIN {
-        $remoteManifestUrl  = 'https://raw.githubusercontent.com/dbuczynski/PowerShell/main/BUTCH/BUTCH.psd1'
+        $remoteManifestUrl = 'https://raw.githubusercontent.com/dbuczynski/PowerShell/main/BUTCH/BUTCH.psd1'
         $remoteInstallerUrl = 'https://raw.githubusercontent.com/dbuczynski/PowerShell/main/Install-BUTCH.ps1'
     }
 
@@ -81,8 +81,8 @@ function Update-BUTCH {
         }
 
         $localModule = $localModuleQuery |
-                       Sort-Object Version -Descending |
-                       Select-Object -First 1
+        Sort-Object Version -Descending |
+        Select-Object -First 1
 
         if ($localModule) {
             $localVersion = $localModule.Version
