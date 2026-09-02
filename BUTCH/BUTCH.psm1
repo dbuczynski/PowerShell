@@ -8,6 +8,7 @@
 
       - Credential management and AD authentication (Initialize-BUTCH, Test-BUTCH_AdCredentials)
       - BitLocker recovery key retrieval from Active Directory (Get-BUTCH_BitLockerRecoveryKey)
+      - Active Directory user group membership retrieval (Get-BUTCH_UserMembership)
       - Secure file distribution with hash verification (Export-BUTCH_FileHash)
       - Structured transcript / session logging (Start-BUTCH_Transcript)
       - Module lifecycle management (Initialize-BUTCH, Clear-BUTCH, Update-BUTCH)
@@ -23,8 +24,8 @@
 
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
-    Release:  2026.05.08 09:00
-    Version:  2026.5.11.100
+    Release:  2026.09.02 13:00
+    Version:  2026.9.2.1
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -150,6 +151,7 @@ Write-Information -InformationAction Continue "${BrightYellow}Initialize-BUTCH $
 Write-Information -InformationAction Continue "${BrightYellow}Clear-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Update-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_BitLockerRecoveryKey ${Reset} "
+Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_UserMembership ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Start-BUTCH_Transcript ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Test-BUTCH_AdCredentials ${Reset} "
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan

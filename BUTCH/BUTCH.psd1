@@ -4,7 +4,7 @@
     Author               = "Daniel Buczynski <DanielBuczynski@gmail.com>"
     CompanyName          = "githhub.com/dbuczynski"
     Description          = 'It does cool stuff for BUTCH.'
-    ModuleVersion        = "2026.5.19.10"
+    ModuleVersion        = "2026.9.2.1"
     PowerShellVersion    = "5.1"
     CompatiblePSEditions = @('Core', 'Desktop')
     Copyright            = "© 2026 All rights reserved."
@@ -18,7 +18,8 @@
         'Start-BUTCH_Transcript',
         'Test-BUTCH_AdCredentials',
         'New-BUTCH_RandomPassword',
-        'Get-BUTCH_RemoteAdministrator'
+        'Get-BUTCH_RemoteAdministrator',
+        'Get-BUTCH_UserMembership'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()
@@ -39,6 +40,7 @@
         '.\Public\Test-BUTCH_AdCredentials.ps1',
         '.\Public\Update-BUTCH.ps1',
         '.\Public\New-BUTCH_RandomPassword.ps1',
-        '.\Public\Get-BUTCH_RemoteAdministrator.ps1'
+        '.\Public\Get-BUTCH_RemoteAdministrator.ps1',
+        '.\Public\Get-BUTCH_UserMembership.ps1'
     )
 }
