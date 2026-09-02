@@ -4,20 +4,24 @@ function Get-BUTCH_UserMembership {
         Retrieves Active Directory group membership for a specified user account or Distinguished Name.
 
     .DESCRIPTION
-        This function queries Active Directory for the specified user (by account name or Distinguished Name),
+        This function queries Active Directory for the specified user (by SAM account name or Distinguished Name),
         retrieves all groups the user belongs to (via the MemberOf property), and returns a list containing
         the user's SamAccountName, AccountName, GroupName, and GroupDescription.
 
-    .PARAMETER Name
-        The username or account name (SamAccountName) to query. Accepts pipeline input (by value or property name).
-        If the input string appears to be a Distinguished Name, it will automatically be treated as such.
+    .PARAMETER SamAccountName
+        The SAM account name or username to query. Accepts pipeline input (by value or property name).
+        Alias 'Name' is supported. If the input string appears to be a Distinguished Name, it will automatically be treated as such.
 
     .PARAMETER distinguishname
         The Distinguished Name (DN) of the user to query. Accepts pipeline input (by value or property name).
 
     .EXAMPLE
-        Get-BUTCH_UserMembership -Name "jdoe"
+        Get-BUTCH_UserMembership -SamAccountName "jdoe"
         Retrieves group membership for user "jdoe".
+
+    .EXAMPLE
+        Get-BUTCH_UserMembership -Name "jdoe"
+        Retrieves group membership for user "jdoe" using the 'Name' alias.
 
     .EXAMPLE
         "jdoe" | Get-BUTCH_UserMembership
@@ -40,8 +44,8 @@ function Get-BUTCH_UserMembership {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.9.2 13:00
-        Version: 2026.9.2.1
+        Release: 2026.9.2 14:00
+        Version: 2026.9.2.2
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -49,11 +53,11 @@ function Get-BUTCH_UserMembership {
         Latest version: https://github.com/dbuczynski/PowerShell
     #>
 
-    [CmdletBinding(DefaultParameterSetName = 'ByName')]
+    [CmdletBinding(DefaultParameterSetName = 'BySamAccountName')]
     param(
-        [Parameter(ParameterSetName = 'ByName', Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Please enter the username for which you want to check group membership.")]
-        [Alias('SamAccountName', 'UserName')]
-        [string]$Name,
+        [Parameter(ParameterSetName = 'BySamAccountName', Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Please enter the username for which you want to check group membership.")]
+        [Alias('Name', 'UserName')]
+        [string]$SamAccountName,
 
         [Parameter(ParameterSetName = 'ByDistinguishedName', Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Please enter the distinguished name of the user for which you want to check group membership.")]
         [Alias('DistinguishedName', 'DN')]
@@ -69,20 +73,20 @@ function Get-BUTCH_UserMembership {
     }
 
     PROCESS {
-        # If neither Name nor distinguishname was supplied, prompt for Name with comment in English
-        if ([string]::IsNullOrWhiteSpace($Name) -and [string]::IsNullOrWhiteSpace($distinguishname)) {
-            $Name = Read-Host -Prompt "Please enter the username for which you want to check group membership"
+        # If neither SamAccountName nor distinguishname was supplied, prompt for SamAccountName with comment in English
+        if ([string]::IsNullOrWhiteSpace($SamAccountName) -and [string]::IsNullOrWhiteSpace($distinguishname)) {
+            $SamAccountName = Read-Host -Prompt "Please enter the username for which you want to check group membership"
         }
 
-        # Check if $Name looks like a Distinguished Name
-        if ([string]::IsNullOrWhiteSpace($distinguishname) -and -not [string]::IsNullOrWhiteSpace($Name)) {
-            if ($Name -match '(?i)^CN=|^OU=|^DC=' -or $Name -match '(?i)DC=') {
-                $distinguishname = $Name
-                $Name = $null
+        # Check if $SamAccountName looks like a Distinguished Name
+        if ([string]::IsNullOrWhiteSpace($distinguishname) -and -not [string]::IsNullOrWhiteSpace($SamAccountName)) {
+            if ($SamAccountName -match '(?i)^CN=|^OU=|^DC=' -or $SamAccountName -match '(?i)DC=') {
+                $distinguishname = $SamAccountName
+                $SamAccountName = $null
             }
         }
 
-        $targetInput = if (-not [string]::IsNullOrWhiteSpace($distinguishname)) { $distinguishname } else { $Name }
+        $targetInput = if (-not [string]::IsNullOrWhiteSpace($distinguishname)) { $distinguishname } else { $SamAccountName }
 
         try {
             if ([string]::IsNullOrWhiteSpace($targetInput)) {
@@ -94,7 +98,7 @@ function Get-BUTCH_UserMembership {
                 $adUser = Get-ADUser -Identity $distinguishname -Properties SamAccountName, Name, MemberOf -ErrorAction Stop
             }
             else {
-                $adUser = Get-ADUser -Identity $Name -Properties SamAccountName, Name, MemberOf -ErrorAction Stop
+                $adUser = Get-ADUser -Identity $SamAccountName -Properties SamAccountName, Name, MemberOf -ErrorAction Stop
             }
 
             if ($null -eq $adUser) {

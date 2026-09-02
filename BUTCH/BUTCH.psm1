@@ -24,8 +24,8 @@
 
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
-    Release:  2026.09.02 13:00
-    Version:  2026.9.2.1
+    Release:  2026.09.02 14:00
+    Version:  2026.9.2.2
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
