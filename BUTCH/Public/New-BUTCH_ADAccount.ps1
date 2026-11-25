@@ -74,8 +74,8 @@
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.11.25 15:35
-        Version: 2026.11.25.3
+        Release: 2026.11.25 15:50
+        Version: 2026.11.25.4
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
