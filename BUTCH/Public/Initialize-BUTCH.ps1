@@ -4,9 +4,13 @@
         Initializes the BUTCH module with required credentials and parameters.
 
     .DESCRIPTION
-        This function sets up the required module-scoped variables (Credential, HashDestinationPath, TranscriptPath)
-        that are needed by other functions in the BUTCH module. It should be run before using 
-        commands that interact with the BUTCH environment.
+        This function sets up the required module-scoped variables (Credential, HashDestinationPath,
+        TranscriptPath, ADAccountPath, MailTemplate, Signature) that are needed by other functions
+        in the BUTCH module. It should be run before using commands that interact with the BUTCH environment.
+
+        When re-run, Initialize-BUTCH automatically recalls the configuration from the previous run
+        (or saved profile at %APPDATA%\BUTCH\profile.json) and offers the previous values as defaults
+        in interactive prompts, so you can press [Enter] to keep them without retyping.
 
     .PARAMETER Credential
         The PSCredential object containing the username and password. 
@@ -17,41 +21,44 @@
 
     .PARAMETER TranscriptPath
         Default absolute path used by Start-BUTCH_Transcript to store log files.
-        If omitted, the function will suggest Desktop\PS\Transcripts as default.
+        If omitted, defaults to previous value or Desktop\PS\Transcripts.
+
+    .PARAMETER ADAccountPath
+        Target Active Directory Organizational Unit (OU) path for newly created administrative accounts.
+        If omitted, defaults to previous value or 'OU=Users,OU=Server Admins,DC=energy,DC=local'.
+
+    .PARAMETER MailTemplate
+        Absolute path to an Outlook email template file (.oft) used when sending account provisioning notifications.
+
+    .PARAMETER Signature
+        Sender signature name to place in administrative emails. Defaults to previous value or 'Daniel Buczyński'.
 
     .PARAMETER Silent
-        Runs initialization without interactive prompts. All required parameters must be provided on input.
+        Runs initialization without interactive prompts. Required values are taken from parameters
+        or resolved from previous run / saved profile.
 
     .PARAMETER SaveProfile
-        Saves the current initialization data (credentials, paths) to a local encrypted profile file
-        at %APPDATA%\BUTCH\profile.json. The password is encrypted using DPAPI (tied to the current
-        Windows user and machine). On next Import-Module BUTCH, the profile is loaded automatically
-        without the need to run Initialize-BUTCH again.
+        Explicitly displays confirmation that the current initialization data has been saved to the local
+        encrypted profile file at %APPDATA%\BUTCH\profile.json. (Profile configuration is automatically
+        persisted so subsequent sessions retain default settings).
         Use Clear-BUTCH -PurgeLocalSettings to remove the saved profile.
-
-    .EXAMPLE
-        $cred = Get-Credential
-        Initialize-BUTCH -Silent -Credential $cred -HashDestinationPath "\\server\share$\folder\" -SaveProfile
-
-        Fully non-interactive initialization with profile saved. On next session, Import-Module BUTCH
-        will restore this configuration automatically.
 
     .EXAMPLE
         Initialize-BUTCH
 
-        Starts interactive initialization. The user will be prompted for all required values.
+        Starts interactive initialization. Any values entered in previous runs are suggested as defaults;
+        press Enter to keep them or type a new value.
 
     .EXAMPLE
         $cred = Get-Credential
-        Initialize-BUTCH -Credential $cred -HashDestinationPath "\\server\share$\folder\"
+        Initialize-BUTCH -Silent -Credential $cred -HashDestinationPath "\\server\share$\folder\"
 
-        Runs interactive initialization with Credential and HashDestinationPath pre-filled.
+        Non-interactive initialization. Omitted parameters use previously stored settings or standard defaults.
 
     .EXAMPLE
-        $cred = Get-Credential
-        Initialize-BUTCH -Silent -Credential $cred -HashDestinationPath "\\server\share$\folder\" -TranscriptPath "C:\Logs"
+        Init-BUTCH
 
-        Fully non-interactive initialization. Useful in automated/scripted environments.
+        Runs interactive initialization using the alias.
 
     .INPUTS
         None
@@ -61,8 +68,8 @@
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.5.3 09:00
-        Version: 2026.5.11.4
+        Release: 2026.11.25 16:20
+        Version: 2026.11.25.5
         License: MIT
         This function is a part of the BUTCH PowerShell module.
         
@@ -104,21 +111,126 @@
         $defaultADAccountPath  = "OU=Users,OU=Server Admins,DC=energy,DC=local"
         $defaultSignature      = "Daniel Buczyński"
 
+        # Try to resolve previous configuration from memory or saved profile
+        $profileDir  = Join-Path $env:APPDATA 'BUTCH'
+        $profilePath = Join-Path $profileDir 'profile.json'
+        $prevProfile = $null
+
+        if (Test-Path $profilePath) {
+            try {
+                $rawProfile = Get-Content -Path $profilePath -Raw -Encoding UTF8 -ErrorAction SilentlyContinue | ConvertFrom-Json
+                $secPass = $null
+                $plainPass = $null
+                if ($rawProfile.PasswordEncrypted) {
+                    $secPass = $rawProfile.PasswordEncrypted | ConvertTo-SecureString -ErrorAction SilentlyContinue
+                    if ($secPass) {
+                        $plainPass = [System.Net.NetworkCredential]::new('', $secPass).Password
+                    }
+                }
+                $prevProfile = [PSCustomObject]@{
+                    Username            = [string]$rawProfile.Username
+                    Password            = [string]$plainPass
+                    HashDestinationPath = [string]$rawProfile.HashDestinationPath
+                    TranscriptPath      = [string]$rawProfile.TranscriptPath
+                    ADAccountPath       = [string]$rawProfile.ADAccountPath
+                    MailTemplate        = [string]$rawProfile.MailTemplate
+                    Signature           = [string]$rawProfile.Signature
+                }
+            }
+            catch {}
+        }
+
+        # Candidate defaults: in-memory script:BUTCH_* takes precedence over saved profile file
+        $prevUser = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_Username)) {
+            $script:BUTCH_Username
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.Username)) {
+            $prevProfile.Username
+        } else { $null }
+
+        $prevPass = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_Password)) {
+            $script:BUTCH_Password
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.Password)) {
+            $prevProfile.Password
+        } else { $null }
+
+        $prevHash = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_HashDestinationPath)) {
+            $script:BUTCH_HashDestinationPath
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.HashDestinationPath)) {
+            $prevProfile.HashDestinationPath
+        } else { $null }
+
+        $prevTranscript = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_TranscriptPath)) {
+            $script:BUTCH_TranscriptPath
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.TranscriptPath)) {
+            $prevProfile.TranscriptPath
+        } else {
+            $defaultTranscriptPath
+        }
+
+        $prevADPath = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_ADAccountPath)) {
+            $script:BUTCH_ADAccountPath
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.ADAccountPath)) {
+            $prevProfile.ADAccountPath
+        } else {
+            $defaultADAccountPath
+        }
+
+        $prevMail = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_MailTemplate)) {
+            $script:BUTCH_MailTemplate
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.MailTemplate)) {
+            $prevProfile.MailTemplate
+        } else { $null }
+
+        $prevSig = if (-not [string]::IsNullOrWhiteSpace($script:BUTCH_Signature)) {
+            $script:BUTCH_Signature
+        } elseif ($prevProfile -and -not [string]::IsNullOrWhiteSpace($prevProfile.Signature)) {
+            $prevProfile.Signature
+        } else {
+            $defaultSignature
+        }
+
         if ($Silent) {
-            if (-not $Credential)                                    { throw "Parameter -Credential is missing, but -Silent switch was used." }
-            if ([string]::IsNullOrWhiteSpace($HashDestinationPath))  { throw "Parameter -HashDestinationPath is missing, but -Silent switch was used." }
-            if ([string]::IsNullOrWhiteSpace($TranscriptPath))       { $TranscriptPath = $defaultTranscriptPath }
-            if ([string]::IsNullOrWhiteSpace($ADAccountPath))        { $ADAccountPath = $defaultADAccountPath }
-            if ([string]::IsNullOrWhiteSpace($Signature))            { $Signature = $defaultSignature }
+            if (-not $Credential) {
+                if (-not [string]::IsNullOrWhiteSpace($prevUser) -and -not [string]::IsNullOrWhiteSpace($prevPass)) {
+                    $sec = ConvertTo-SecureString $prevPass -AsPlainText -Force
+                    $Credential = New-Object System.Management.Automation.PSCredential ($prevUser, $sec)
+                }
+                else {
+                    throw "Parameter -Credential is missing, but -Silent switch was used."
+                }
+            }
+            if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) {
+                if (-not [string]::IsNullOrWhiteSpace($prevHash)) {
+                    $HashDestinationPath = $prevHash
+                }
+                else {
+                    throw "Parameter -HashDestinationPath is missing, but -Silent switch was used."
+                }
+            }
+            if ([string]::IsNullOrWhiteSpace($TranscriptPath)) { $TranscriptPath = $prevTranscript }
+            if ([string]::IsNullOrWhiteSpace($ADAccountPath))  { $ADAccountPath = $prevADPath }
+            if ([string]::IsNullOrWhiteSpace($MailTemplate))   { $MailTemplate = $prevMail }
+            if ([string]::IsNullOrWhiteSpace($Signature))      { $Signature = $prevSig }
         }
         else {
             Write-Host "--- BUTCH Module Initialization ---" -ForegroundColor Cyan
 
             # HashDestinationPath
             if ([string]::IsNullOrWhiteSpace($HashDestinationPath)) {
-                do {
-                    $HashDestinationPath = Read-Host "Provide HashDestinationPath (e.g., \\server\share`$\folder\)"
-                } while ([string]::IsNullOrWhiteSpace($HashDestinationPath))
+                if (-not [string]::IsNullOrWhiteSpace($prevHash)) {
+                    $inputHashPath = Read-Host "Provide HashDestinationPath [$prevHash] (Enter = keep)"
+                    if ([string]::IsNullOrWhiteSpace($inputHashPath)) {
+                        $HashDestinationPath = $prevHash
+                    }
+                    else {
+                        $HashDestinationPath = $inputHashPath
+                    }
+                }
+                else {
+                    do {
+                        $HashDestinationPath = Read-Host "Provide HashDestinationPath (e.g., \\server\share`$\folder\)"
+                    } while ([string]::IsNullOrWhiteSpace($HashDestinationPath))
+                }
             }
             else {
                 $inputHashPath = Read-Host "Provide HashDestinationPath [$HashDestinationPath] (Enter = keep)"
@@ -129,9 +241,9 @@
 
             # TranscriptPath
             if ([string]::IsNullOrWhiteSpace($TranscriptPath)) {
-                $inputTranscriptPath = Read-Host "Provide TranscriptPath (Enter = keep default: $defaultTranscriptPath)"
+                $inputTranscriptPath = Read-Host "Provide TranscriptPath [$prevTranscript] (Enter = keep)"
                 if ([string]::IsNullOrWhiteSpace($inputTranscriptPath)) {
-                    $TranscriptPath = $defaultTranscriptPath
+                    $TranscriptPath = $prevTranscript
                 }
                 else {
                     $TranscriptPath = $inputTranscriptPath
@@ -144,11 +256,11 @@
                 }
             }
 
-            # OU for new Admin Account
+            # OU for new Admin Account (ADAccountPath)
             if ([string]::IsNullOrWhiteSpace($ADAccountPath)) {
-                $inputADPath = Read-Host "Provide OU for new Admin Account (Enter = keep default: $defaultADAccountPath)"
+                $inputADPath = Read-Host "Provide OU for new Admin Account [$prevADPath] (Enter = keep)"
                 if ([string]::IsNullOrWhiteSpace($inputADPath)) {
-                    $ADAccountPath = $defaultADAccountPath
+                    $ADAccountPath = $prevADPath
                 }
                 else {
                     $ADAccountPath = $inputADPath
@@ -163,23 +275,42 @@
 
             # Mail Template for new Admin Account
             if ([string]::IsNullOrWhiteSpace($MailTemplate)) {
-                $inputMailTemplate = Read-Host "Provide Mail Template for new Admin Account (e.g. C:\Templates\NewAdminAccount.oft) (Optional)"
-                if (-not [string]::IsNullOrWhiteSpace($inputMailTemplate)) {
-                    $MailTemplate = $inputMailTemplate
+                if (-not [string]::IsNullOrWhiteSpace($prevMail)) {
+                    $inputMailTemplate = Read-Host "Provide Mail Template for new Admin Account [$prevMail] (Enter = keep)"
+                    if ([string]::IsNullOrWhiteSpace($inputMailTemplate)) {
+                        $MailTemplate = $prevMail
+                    }
+                    elseif ($inputMailTemplate.Trim() -in @('none', 'clear', '$null', '""', "''")) {
+                        $MailTemplate = $null
+                    }
+                    else {
+                        $MailTemplate = $inputMailTemplate
+                    }
+                }
+                else {
+                    $inputMailTemplate = Read-Host "Provide Mail Template for new Admin Account (e.g. C:\Templates\NewAdminAccount.oft) (Optional)"
+                    if (-not [string]::IsNullOrWhiteSpace($inputMailTemplate)) {
+                        $MailTemplate = $inputMailTemplate
+                    }
                 }
             }
             else {
                 $inputMailTemplate = Read-Host "Provide Mail Template for new Admin Account [$MailTemplate] (Enter = keep)"
                 if (-not [string]::IsNullOrWhiteSpace($inputMailTemplate)) {
-                    $MailTemplate = $inputMailTemplate
+                    if ($inputMailTemplate.Trim() -in @('none', 'clear', '$null', '""', "''")) {
+                        $MailTemplate = $null
+                    }
+                    else {
+                        $MailTemplate = $inputMailTemplate
+                    }
                 }
             }
 
             # Signed by (name)
             if ([string]::IsNullOrWhiteSpace($Signature)) {
-                $inputSig = Read-Host "Provide Signed by (name) (Enter = keep default: $defaultSignature)"
+                $inputSig = Read-Host "Provide Signed by (name) [$prevSig] (Enter = keep)"
                 if ([string]::IsNullOrWhiteSpace($inputSig)) {
-                    $Signature = $defaultSignature
+                    $Signature = $prevSig
                 }
                 else {
                     $Signature = $inputSig
@@ -200,7 +331,20 @@
                 Write-Host "  Password: ********"
                 $confirm = Read-Host "Do you confirm using these credentials? [Y/n] (Enter = Yes)"
                 if ($confirm -eq 'n' -or $confirm -eq 'N') {
-                    $Credential = Get-Credential -Message "Enter credentials for the BUTCH module (privileged access)"
+                    $Credential = Get-Credential -UserName $username -Message "Enter credentials for the BUTCH module (privileged access)"
+                }
+            }
+            elseif (-not [string]::IsNullOrWhiteSpace($prevUser) -and -not [string]::IsNullOrWhiteSpace($prevPass)) {
+                Write-Host "Previous credentials found from last initialization:" -ForegroundColor Yellow
+                Write-Host "  Username: $prevUser"
+                Write-Host "  Password: ********"
+                $confirm = Read-Host "Do you want to keep these credentials? [Y/n] (Enter = Yes)"
+                if ($confirm -eq 'n' -or $confirm -eq 'N') {
+                    $Credential = Get-Credential -UserName $prevUser -Message "Enter credentials for the BUTCH module (privileged access)"
+                }
+                else {
+                    $sec = ConvertTo-SecureString $prevPass -AsPlainText -Force
+                    $Credential = New-Object System.Management.Automation.PSCredential ($prevUser, $sec)
                 }
             }
             else {
@@ -227,7 +371,7 @@
             $script:BUTCH_MailTemplate          = $MailTemplate
             $script:BUTCH_Signature             = $Signature
             [datetime]$script:BUTCH_InitializedAt       = Get-Date
-            [bool]$script:BUTCH_IsInitializedFromPrompt = $Silent
+            [bool]$script:BUTCH_IsInitializedFromPrompt = (-not $Silent)
             $script:BUTCH_IsInitialized         = $true
 
             Write-Verbose "BUTCH module initialized successfully with user: $username"
@@ -239,43 +383,36 @@
     }
 
     END {
-        if ($SaveProfile) {
-            try {
-                $profileDir  = Join-Path $env:APPDATA 'BUTCH'
-                $profilePath = Join-Path $profileDir 'profile.json'
+        try {
+            $profileDir  = Join-Path $env:APPDATA 'BUTCH'
+            $profilePath = Join-Path $profileDir 'profile.json'
 
-                if (-not (Test-Path $profileDir)) {
-                    New-Item -ItemType Directory -Path $profileDir | Out-Null
-                }
-
-                $encryptedPassword = $Credential.Password | ConvertFrom-SecureString   # DPAPI, no key = user+machine bound
-                
-                # Use local variables to avoid script: scope issues in the profile object construction
-                $profileUsername   = Get-Variable -Name 'BUTCH_Username' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
-                $profileHashPath   = Get-Variable -Name 'BUTCH_HashDestinationPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
-                $profileTransPath  = Get-Variable -Name 'BUTCH_TranscriptPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
-                $profileADPath     = Get-Variable -Name 'BUTCH_ADAccountPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
-                $profileMailTemp   = Get-Variable -Name 'BUTCH_MailTemplate' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
-                $profileSignature  = Get-Variable -Name 'BUTCH_Signature' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
-
-                @{
-                    Username            = $profileUsername
-                    PasswordEncrypted   = $encryptedPassword
-                    HashDestinationPath = $profileHashPath
-                    TranscriptPath      = $profileTransPath
-                    ADAccountPath       = $profileADPath
-                    MailTemplate        = $profileMailTemp
-                    Signature           = $profileSignature
-                    SavedAt             = (Get-Date -Format 'o')
-                } | ConvertTo-Json | Set-Content -Path $profilePath -Encoding UTF8
-
-                Write-Host "BUTCH profile saved: $profilePath" -ForegroundColor Green
-                Write-Verbose "Profile saved at: $profilePath"
+            if (-not (Test-Path $profileDir)) {
+                New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
             }
-            catch {
-                Write-Warning "BUTCH: Could not save profile: $_"
+
+            $encryptedPassword = $Credential.Password | ConvertFrom-SecureString   # DPAPI, no key = user+machine bound
+            
+            @{
+                Username            = $script:BUTCH_Username
+                PasswordEncrypted   = $encryptedPassword
+                HashDestinationPath = $script:BUTCH_HashDestinationPath
+                TranscriptPath      = $script:BUTCH_TranscriptPath
+                ADAccountPath       = $script:BUTCH_ADAccountPath
+                MailTemplate        = $script:BUTCH_MailTemplate
+                Signature           = $script:BUTCH_Signature
+                SavedAt             = (Get-Date -Format 'o')
+            } | ConvertTo-Json | Set-Content -Path $profilePath -Encoding UTF8
+
+            Write-Verbose "Profile saved at: $profilePath"
+            if ($SaveProfile) {
+                Write-Host "BUTCH profile saved: $profilePath" -ForegroundColor Green
             }
         }
+        catch {
+            Write-Warning "BUTCH: Could not save profile: $_"
+        }
+
         Get-BUTCH
     }
 }
