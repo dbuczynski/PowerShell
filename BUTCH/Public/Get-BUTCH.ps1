@@ -45,6 +45,9 @@ function Get-BUTCH {
                 HasPassword             = [bool](Get-Variable -Name 'BUTCH_Password' -Scope Script -ValueOnly -ErrorAction SilentlyContinue)
                 HashDestinationPath     = Get-Variable -Name 'BUTCH_HashDestinationPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
                 TranscriptPath          = Get-Variable -Name 'BUTCH_TranscriptPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                ADAccountPath           = Get-Variable -Name 'BUTCH_ADAccountPath' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                MailTemplate            = Get-Variable -Name 'BUTCH_MailTemplate' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+                Signature               = Get-Variable -Name 'BUTCH_Signature' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
                 InitializedAt           = Get-Variable -Name 'BUTCH_InitializedAt' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
                 IsInitializedFromPrompt = Get-Variable -Name 'BUTCH_IsInitializedFromPrompt' -Scope Script -ValueOnly -ErrorAction SilentlyContinue
             }

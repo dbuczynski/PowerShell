@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     BUTCH — a PowerShell module for IT administrators working in Active Directory environments.
 
@@ -9,6 +9,8 @@
       - Credential management and AD authentication (Initialize-BUTCH, Test-BUTCH_AdCredentials)
       - BitLocker recovery key retrieval from Active Directory (Get-BUTCH_BitLockerRecoveryKey)
       - Active Directory user group membership retrieval (Get-BUTCH_UserMembership)
+      - Administrative AD account provisioning (New-BUTCH_ADAccount)
+      - System sleep and lock prevention (Keep-BUTCH_SystemAwake)
       - Secure file distribution with hash verification (Export-BUTCH_FileHash)
       - Structured transcript / session logging (Start-BUTCH_Transcript)
       - Module lifecycle management (Initialize-BUTCH, Clear-BUTCH, Update-BUTCH)
@@ -24,8 +26,8 @@
 
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
-    Release:  2026.09.02 14:00
-    Version:  2026.9.2.2
+    Release:  2026.11.25 15:15
+    Version:  2026.11.25.1
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -42,6 +44,9 @@ $script:BUTCH_Username = $null
 $script:BUTCH_Password = $null
 $script:BUTCH_HashDestinationPath = $null
 $script:BUTCH_TranscriptPath = $null
+$script:BUTCH_ADAccountPath = $null
+$script:BUTCH_MailTemplate = $null
+$script:BUTCH_Signature = $null
 $script:BUTCH_InitializedAt = $null
 $script:BUTCH_IsInitializedFromPrompt = $false
 
@@ -65,6 +70,9 @@ function Read-BUTCH_Profile {
             Password            = [string]$plainPassword
             HashDestinationPath = [string]$data.HashDestinationPath
             TranscriptPath      = [string]$data.TranscriptPath
+            ADAccountPath       = [string]$data.ADAccountPath
+            MailTemplate        = [string]$data.MailTemplate
+            Signature           = [string]$data.Signature
         }
     }
     catch {
@@ -84,6 +92,9 @@ if ($null -ne $__butchProfile) {
     $script:BUTCH_Password = $__butchProfile.Password
     $script:BUTCH_HashDestinationPath = $__butchProfile.HashDestinationPath
     $script:BUTCH_TranscriptPath = $__butchProfile.TranscriptPath
+    $script:BUTCH_ADAccountPath = $__butchProfile.ADAccountPath
+    $script:BUTCH_MailTemplate = $__butchProfile.MailTemplate
+    $script:BUTCH_Signature = $__butchProfile.Signature
     $script:BUTCH_IsInitialized = $true
     [datetime]$script:BUTCH_InitializedAt = Get-Date
     [bool]$script:BUTCH_IsInitializedFromPrompt = $false
@@ -152,6 +163,8 @@ Write-Information -InformationAction Continue "${BrightYellow}Clear-BUTCH ${Rese
 Write-Information -InformationAction Continue "${BrightYellow}Update-BUTCH ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_BitLockerRecoveryKey ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Get-BUTCH_UserMembership ${Reset} "
+Write-Information -InformationAction Continue "${BrightYellow}New-BUTCH_ADAccount ${Reset} "
+Write-Information -InformationAction Continue "${BrightYellow}Keep-BUTCH_SystemAwake ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Start-BUTCH_Transcript ${Reset} "
 Write-Information -InformationAction Continue "${BrightYellow}Test-BUTCH_AdCredentials ${Reset} "
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan

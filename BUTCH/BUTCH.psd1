@@ -1,10 +1,10 @@
-@{
+﻿@{
     RootModule           = 'BUTCH.psm1'
     GUID                 = 'f4585434-d121-450b-b3ea-db7fcddedb95'
     Author               = "Daniel Buczynski <DanielBuczynski@gmail.com>"
     CompanyName          = "githhub.com/dbuczynski"
     Description          = 'It does cool stuff for BUTCH.'
-    ModuleVersion        = "2026.9.2.2"
+    ModuleVersion        = "2026.11.25.1"
     PowerShellVersion    = "5.1"
     CompatiblePSEditions = @('Core', 'Desktop')
     Copyright            = "© 2026 All rights reserved."
@@ -19,7 +19,9 @@
         'Test-BUTCH_AdCredentials',
         'New-BUTCH_RandomPassword',
         'Get-BUTCH_RemoteAdministrator',
-        'Get-BUTCH_UserMembership'
+        'Get-BUTCH_UserMembership',
+        'Keep-BUTCH_SystemAwake',
+        'New-BUTCH_ADAccount'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()
@@ -41,6 +43,8 @@
         '.\Public\Update-BUTCH.ps1',
         '.\Public\New-BUTCH_RandomPassword.ps1',
         '.\Public\Get-BUTCH_RemoteAdministrator.ps1',
-        '.\Public\Get-BUTCH_UserMembership.ps1'
+        '.\Public\Get-BUTCH_UserMembership.ps1',
+        '.\Public\Keep-BUTCH_SystemAwake.ps1',
+        '.\Public\New-BUTCH_ADAccount.ps1'
     )
 }
