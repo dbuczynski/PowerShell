@@ -1,4 +1,4 @@
-function Update-BUTCH {
+﻿function Update-BUTCH {
     <#
     .SYNOPSIS
         Checks for a newer version of the BUTCH module and updates if available.
@@ -50,8 +50,8 @@ function Update-BUTCH {
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.5.7 00:00
-        Version: 2026.5.19.10
+        Release: 2026.11.25 15:35
+        Version: 2026.11.25.3
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -127,6 +127,9 @@ function Update-BUTCH {
             if ($PSCmdlet.ShouldProcess("BUTCH module", "Install version $remoteVersion")) {
                 Write-Host "Running installer..." -ForegroundColor Cyan
                 $installerScript = (Invoke-WebRequest -Uri $remoteInstallerUrl -UseBasicParsing).Content
+                if ($installerScript) {
+                    $installerScript = $installerScript.TrimStart([char]65279)
+                }
                 $installParams = @{}
                 if ($AllUsers) { $installParams.Add('AllUsers', $true) }
                 

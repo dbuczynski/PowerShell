@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Installs or updates the BUTCH PowerShell module from GitHub.
 
