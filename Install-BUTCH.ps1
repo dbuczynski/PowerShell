@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Installs or updates the BUTCH PowerShell module from GitHub.
 
@@ -184,6 +184,7 @@ try {
     if (-not (Test-Path '$moduleRootPath')) { New-Item -ItemType Directory -Path '$moduleRootPath' -Force | Out-Null }
     if (Test-Path '$modulePath')            { Remove-Item '$modulePath' -Recurse -Force }
     Copy-Item -Path '$sourceModulePath' -Destination '$modulePath' -Recurse -Force
+    Get-ChildItem -Path '$modulePath' -Recurse | Unblock-File -ErrorAction SilentlyContinue
     "SUCCESS" | Set-Content '$elevatedLog'
 }
 catch {
@@ -221,6 +222,7 @@ catch {
         if (-not (Test-Path $moduleRootPath)) { New-Item -ItemType Directory -Path $moduleRootPath | Out-Null }
         if (Test-Path $modulePath) { Remove-Item $modulePath -Recurse -Force -ErrorAction SilentlyContinue }
         Copy-Item -Path $sourceModulePath -Destination $modulePath -Recurse -Force
+        Get-ChildItem -Path $modulePath -Recurse | Unblock-File -ErrorAction SilentlyContinue
 
         # 4. Import
         Write-Host "[4/4] Importing BUTCH module (version $moduleVersion)..."

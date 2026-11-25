@@ -26,8 +26,8 @@
 
 .NOTES
     Author:   Daniel Buczynski <DanielBuczynski@gmail.com>
-    Release:  2026.11.25 15:15
-    Version:  2026.11.25.1
+    Release:  2026.11.25 15:30
+    Version:  2026.11.25.2
     License:  MIT
     Source:   https://github.com/dbuczynski/PowerShell
 
@@ -82,7 +82,17 @@ function Read-BUTCH_Profile {
 }
 
 foreach ($directory in @('Public')) {
-    Get-ChildItem -Recurse -Path "$PSScriptRoot\$directory\*.ps1" | ForEach-Object { . $_.FullName }
+    $dirPath = Join-Path $PSScriptRoot $directory
+    if (Test-Path $dirPath) {
+        Get-ChildItem -Path $dirPath -Filter '*.ps1' -Recurse | ForEach-Object {
+            try {
+                . $_.FullName
+            }
+            catch {
+                Write-Warning "BUTCH: Failed to load script $($_.FullName): $_"
+            }
+        }
+    }
 }
 
 # Auto-load saved profile if available (silent — no prompts)
@@ -179,3 +189,23 @@ Write-Information -InformationAction Continue "${BrightYellow}irm https://raw.gi
 
 Write-Information -InformationAction Continue "${Cyan}============================================================ ${Reset}" # -ForegroundColor Cyan
 Write-Information -InformationAction Continue ""
+
+Export-ModuleMember -Function @(
+    'Initialize-BUTCH',
+    'Clear-BUTCH',
+    'Get-BUTCH',
+    'Update-BUTCH',
+    'Export-BUTCH_FileHash',
+    'Get-BUTCH_BitLockerRecoveryKey',
+    'Start-BUTCH_Transcript',
+    'Test-BUTCH_AdCredentials',
+    'New-BUTCH_RandomPassword',
+    'Get-BUTCH_RemoteAdministrator',
+    'Get-BUTCH_UserMembership',
+    'Keep-BUTCH_SystemAwake',
+    'New-BUTCH_ADAccount'
+) -Alias @(
+    'Init-BUTCH',
+    'Reset-BUTCH',
+    'ST'
+)

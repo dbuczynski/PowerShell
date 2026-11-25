@@ -1,4 +1,4 @@
-function Keep-BUTCH_SystemAwake {
+﻿function Keep-BUTCH_SystemAwake {
     <#
     .SYNOPSIS
         Prevents the operating system from sleeping, turning off the display, or locking due to inactivity.

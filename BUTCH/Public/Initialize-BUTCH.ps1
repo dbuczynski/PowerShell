@@ -81,13 +81,15 @@
         [string]$TranscriptPath,
 
         [Parameter(Position = 3)]
-        [Alias('Path')]
+        [Alias('Path', 'OU', 'ADPath', 'OUForNewAdminAccount')]
         [string]$ADAccountPath,
 
         [Parameter(Position = 4)]
+        [Alias('Template', 'MailTemplateForNewAdminAccount')]
         [string]$MailTemplate,
 
         [Parameter(Position = 5)]
+        [Alias('SignedBy', 'SignatureName')]
         [string]$Signature,
 
         [Parameter()]
@@ -142,9 +144,9 @@
                 }
             }
 
-            # ADAccountPath
+            # OU for new Admin Account
             if ([string]::IsNullOrWhiteSpace($ADAccountPath)) {
-                $inputADPath = Read-Host "Provide ADAccountPath (Enter = keep default: $defaultADAccountPath)"
+                $inputADPath = Read-Host "Provide OU for new Admin Account (Enter = keep default: $defaultADAccountPath)"
                 if ([string]::IsNullOrWhiteSpace($inputADPath)) {
                     $ADAccountPath = $defaultADAccountPath
                 }
@@ -153,29 +155,29 @@
                 }
             }
             else {
-                $inputADPath = Read-Host "Provide ADAccountPath [$ADAccountPath] (Enter = keep)"
+                $inputADPath = Read-Host "Provide OU for new Admin Account [$ADAccountPath] (Enter = keep)"
                 if (-not [string]::IsNullOrWhiteSpace($inputADPath)) {
                     $ADAccountPath = $inputADPath
                 }
             }
 
-            # MailTemplate
+            # Mail Template for new Admin Account
             if ([string]::IsNullOrWhiteSpace($MailTemplate)) {
-                $inputMailTemplate = Read-Host "Provide MailTemplate path (e.g. C:\Templates\NewAdminAccount.oft) (Optional)"
+                $inputMailTemplate = Read-Host "Provide Mail Template for new Admin Account (e.g. C:\Templates\NewAdminAccount.oft) (Optional)"
                 if (-not [string]::IsNullOrWhiteSpace($inputMailTemplate)) {
                     $MailTemplate = $inputMailTemplate
                 }
             }
             else {
-                $inputMailTemplate = Read-Host "Provide MailTemplate [$MailTemplate] (Enter = keep)"
+                $inputMailTemplate = Read-Host "Provide Mail Template for new Admin Account [$MailTemplate] (Enter = keep)"
                 if (-not [string]::IsNullOrWhiteSpace($inputMailTemplate)) {
                     $MailTemplate = $inputMailTemplate
                 }
             }
 
-            # Signature
+            # Signed by (name)
             if ([string]::IsNullOrWhiteSpace($Signature)) {
-                $inputSig = Read-Host "Provide Signature (Enter = keep default: $defaultSignature)"
+                $inputSig = Read-Host "Provide Signed by (name) (Enter = keep default: $defaultSignature)"
                 if ([string]::IsNullOrWhiteSpace($inputSig)) {
                     $Signature = $defaultSignature
                 }
@@ -184,7 +186,7 @@
                 }
             }
             else {
-                $inputSig = Read-Host "Provide Signature [$Signature] (Enter = keep)"
+                $inputSig = Read-Host "Provide Signed by (name) [$Signature] (Enter = keep)"
                 if (-not [string]::IsNullOrWhiteSpace($inputSig)) {
                     $Signature = $inputSig
                 }

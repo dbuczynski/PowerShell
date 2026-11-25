@@ -74,8 +74,8 @@
 
     .NOTES
         Author: DanielBuczynski@gmail.com
-        Release: 2026.11.25 15:15
-        Version: 2026.11.25.1
+        Release: 2026.11.25 15:30
+        Version: 2026.11.25.2
         License: MIT
         This function is a part of the BUTCH PowerShell module.
 
@@ -99,13 +99,16 @@
         [Parameter(Mandatory = $true, Position = 2, ParameterSetName = 'GeneratePassword', HelpMessage = "Generate a secure random password automatically.")]
         [switch]$GeneratePassword,
 
-        [Parameter(Position = 3, HelpMessage = "Active Directory OU path where the new account will be created.")]
+        [Parameter(Position = 3, HelpMessage = "Active Directory OU path where the new account will be created. Defaults to OU configured in Initialize-BUTCH.")]
+        [Alias('OU', 'ADAccountPath', 'ADPath')]
         [string]$Path,
 
-        [Parameter(Position = 4, HelpMessage = "Path to the Outlook mail template (.oft, .html, .txt).")]
+        [Parameter(Position = 4, HelpMessage = "Path to the Outlook mail template (.oft, .html, .txt). Defaults to template configured in Initialize-BUTCH.")]
+        [Alias('Template', 'MailTemplatePath')]
         [string]$MailTemplate,
 
-        [Parameter(Position = 5, HelpMessage = "Sender signature name to use in the mail template.")]
+        [Parameter(Position = 5, HelpMessage = "Sender signature name to use in the mail template. Defaults to signature configured in Initialize-BUTCH.")]
+        [Alias('SignedBy')]
         [string]$Signature,
 
         [Parameter(HelpMessage = "Privileged Active Directory credential. If omitted, credentials from Initialize-BUTCH are used.")]
